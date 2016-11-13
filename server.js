@@ -40,7 +40,7 @@ var sess = {
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
-        callback(null, './upload');
+        callback(null, './public/upload');
     },
     filename: function (req, file, callback) {
         callback(null, file.fieldname + '-' + uniqid());
