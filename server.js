@@ -209,8 +209,13 @@ app.post('/edit_profil.html', function (req, res) {
 					})
 					req.session.profil_pic = req.file.path;
 				}
-				connection.query("INSERT INTO pictures(pic, username) VALUES (?,?)", [req.file.path, req.session.username], function (err) {
-					if (err) throw err;
+				connection.query("SELECT * FROM pictures WHERE username = ?", [req.session.username], function (err, rows) {
+					if (err) throw err
+					if (rows.length < 5) {
+						connection.query("INSERT INTO pictures(pic, username) VALUES (?,?)", [req.file.path, req.session.username], function (err) {
+							if (err) throw err;
+						})
+					}
 				})
 				var ret = "File is uploaded";
 			}
@@ -272,12 +277,13 @@ app.get('/profile.html', function (req, res) {
 			var birth = profile.age(rows[0].birthday);
 			var infos = rows[0];
 			infos.birth = birth;
-			connection.query("SELECT * FROM pictures WHERE username = ?", [req.session.username], function (err, rows) {
+			connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.session.username, rows[0].profil_pic], function (err, rows) {
 				if (err) throw err;
+				//console.log(rows);
 				for (var k in rows) {
 					infos['pics' + k + ''] = rows[k].pic;
 				}
-				console.log(infos);
+				//console.log(infos);
 				res.render("profile.html", infos);
 			})
 		})
@@ -294,18 +300,45 @@ app.get('/users.html/:user', function (req, res) {
 		else {
 			connection.query("SELECT * FROM users WHERE username = ?", [req.params.user], function (err, rows) {
 				if (err) throw err;
-				var infos = rows[0];
-				infos.birth = profile.age(rows[0].birthday);
-				connection.query("SELECT * FROM pictures WHERE username = ?", [req.params.user], function (err, rows) {
-					if (err) throw err;
-					for (var k in rows) {
-						infos['pics' + k + ''] = rows[k].pic;
-					}
-					res.render('users.html', infos);
-				})
+				if (!rows.length) {
+					res.redirect('/match.html');
+				}
+				else {
+					var infos = rows[0];
+					infos.birth = profile.age(rows[0].birthday);
+					connection.query("UPDATE users SET pop = pop + 2 WHERE username = ?", [req.params.user], function (err) {
+						if (err) throw err;
+					}, connection.query("SELECT * FROM pictures WHERE username = ?", [req.params.user], function (err, rows) {
+						if (err) throw err;
+						for (var k in rows) {
+							infos['pics' + k + ''] = rows[k].pic;
+						}
+						res.render('users.html', infos);
+					}))
+				}
 			})
 		}
 	}
+});
+app.post("/users.html/:user", function (req, res) {
+	connection.query("SELECT * FROM users WHERE username = ?", [req.params.user], function (err, rows) {
+		if (err) throw err;
+		if (!rows.length) {
+			res.redirect('/match.html');
+		}
+		else {
+			var infos = rows[0];
+			infos.birth = profile.age(rows[0].birthday);
+			var pov = req.body.pov;
+			if (pov === "follow") {
+				infos.follow = "you like " + rows[0].firstname + "";
+			}
+			else if (pov === "unfollow") {
+				infos.follow = "you do not like " + rows[0].firstname + " anymore";
+			}
+			res.render('users.html', infos)
+		}
+	})
 });
 app.get("/logout.html", function (req, res) {
 	if (!req.session.username) {
@@ -320,6 +353,30 @@ app.get("/logout.html", function (req, res) {
 	}
 });
 /*     S  E  R  V  E  R     */
-https.createServer(options, app, function (req, res) {
+var httpsServer = https.createServer(options, app, function (req, res) {
 	res.writeHead(200);
-}).listen(4433);
+});
+httpsServer.listen(4433);
+/*     S  O  C  K  E  T     */
+var io = require('socket.io')(httpsServer);
+io.sockets.on('connection', function (socket) {
+	console.log(socket.Server);
+	socket.on("changeprofile_pic", function (data) {
+		data.picture = data.picture.replace("https://localhost:4433/", "");
+		var username = data.picture.replace("upload/", "");
+		//console.log(username);
+		username = username.split("-")[0];
+		//console.log(socket.request.session);
+		connection.query("UPDATE users SET profil_pic = ? WHERE username =?", [data.picture, username], function (err) {
+			if (err) throw err;
+		});
+	});
+	socket.on("delete_pic", function (data) {
+		data.picture = data.picture.replace("https://localhost:4433/", "");
+		var username = data.picture.replace("upload/", "");
+		username = username.split("-")[0];
+		connection.query("DELETE FROM pictures WHERE pic = ?", [data.picture], function (err) {
+			if (err) throw err;
+		})
+	})
+});

@@ -13,7 +13,7 @@
 <body>
 	<div class="menu"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo">
 		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
-		<a href="/profile_perso.html"><img class="menu-img" src="/img/account.png"></a>
+		<a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
 		<a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
 		<a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>
 	</div>
@@ -39,7 +39,7 @@
 				<input class="input d1" type="submit" name="pov" value="follow">
 				<input class="input d2" type="submit" name="pov" value="unfollow"> </form>
 			<div class="reglage"> </div>
-			<div class="relation">Kiefer vous follow</div>
+			<div class="relation">{{follow}}</div>
 		</div>
 		<div id="my_pictures" class="usr-set">{{#pics0}} <img class="usr-set-img" src="/{{pics0}}" alt="user-images"> {{/pics0}} {{^pics0}}{{/pics0}} {{#pics1}}<img class="usr-set-img" src="/{{pics1}}" alt="user-images"> {{/pics1}} {{^pics1}}{{/pics1}} {{#pics2}}<img class="usr-set-img" src="/{{pics2}}" alt="user-images"> {{/pics2}} {{^pics2}}{{/pics2}} {{#pics3}}<img class="usr-set-img" src="/{{pics3}}" alt="user-images">{{/pics3}} {{^pics3}}{{/pics3}} </div>
 		<div class="bottom-bar" align="left">

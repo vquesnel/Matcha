@@ -10,10 +10,3 @@ function previewFile() {
         document.getElementById("photo").setAttribute("style", "display:block");
     }
 }
-
-function Changeprofile_pic(img) {
-    var socket = io.connect('http://localhost:1234');
-    socket.emit("changeprofile_pic", {
-        picture: img.src
-    });
-}
