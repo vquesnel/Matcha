@@ -11,9 +11,10 @@ function previewFile() {
 	}
 }
 
-function delete_pic(src) {
+function delete_pic(_this) {
 	var socket = io.connect('https://localhost:4433');
 	socket.emit("delete_pic", {
-		picture: src
+		picture: _this.src
 	});
+	_this.remove();
 }
