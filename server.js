@@ -67,7 +67,9 @@ connection.connect(function (err) {
 connection.query("CREATE DATABASE IF NOT EXISTS matcha;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`users` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(255) NOT NULL , `lastname` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `birthday` DATE NOT NULL , `email` VARCHAR(255) NOT NULL , `password` VARCHAR(255) NOT NULL , `sexe` VARCHAR(8) NOT NULL , `token` VARCHAR(255) NOT NULL , `validation` VARCHAR(1) NOT NULL DEFAULT '0' ,  `profil_pic` LONGTEXT DEFAULT NULL, `sexual_or` VARCHAR(10) NOT NULL DEFAULT 'bi' , `bio` VARCHAR(255) DEFAULT NULL , `location` VARCHAR(255) DEFAULT NULL , `tags` VARCHAR(255) DEFAULT NULL , `pop` INT(5) DEFAULT '0', login VARCHAR(255), `sessionID` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`pictures` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `pic` LONGTEXT NOT NULL , `username` VARCHAR(255) NOT NULL,  PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`history` ( `visitor` VARCHAR(255) NOT NULL , `visited` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;")
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`history` ( `visitor` VARCHAR(255) NOT NULL , `visited` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`liking` ( `liker` VARCHAR(255) NOT NULL , `liked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`reports` ( `repoter` VARCHAR(255) NOT NULL , `reported` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("use matcha");
 /*     P  A  G  E  S      R  E  Q  U  E  S  T  S     -     E X P R E S S     */
 app.engine('html', mustacheExpress());
@@ -331,7 +333,7 @@ app.get('/match.html', function (req, res) {
                     else {
                         for (var k in rows) {
                             rows[k].class = (Number(k) % 2) + 1;
-                            rows[k].birth = profile.age[k].birthday;
+                            rows[k].birth = profile.age(rows[k].birthday);
                         }
                         res.render("match.html", {
                             homepage: {
@@ -427,13 +429,31 @@ app.post("/users.html/:user", function (req, res) {
                 var infos = rows[0];
                 var pov = req.body.pov;
                 if (pov === "follow") {
-                    connection.query("UPDATE users SET pop =pop + 5 WHERE username = ?", [req.params.user], function (err) {
+                    connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, rows) {
                         if (err) throw err;
+
+                        if (!rows[0]) {
+                            connection.query("INSERT INTO liking(liker, liked) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
+                                if (err) throw err;
+                            });
+                            connection.query("UPDATE users SET pop =pop + 5 WHERE username = ?", [req.params.user], function (err) {
+                                if (err) throw err;
+                            })
+                        }
                     })
                     infos.follow = "you like " + rows[0].firstname + "";
                 } else if (pov === "unfollow") {
-                    connection.query("UPDATE users SET pop = pop - 5 WHERE username = ?", [req.params.user], function (err) {
+                    connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, rows) {
                         if (err) throw err;
+
+                        if (rows[0]) {
+                            connection.query("DELETE FROM liking WHERE liker=? AND liked = ?", [req.session.username, req.params.user], function (err) {
+                                if (err) throw err;
+                            });
+                            connection.query("UPDATE users SET pop =pop - 5 WHERE username = ?", [req.params.user], function (err) {
+                                if (err) throw err;
+                            })
+                        }
                     })
                     infos.follow = "you do not like " + rows[0].firstname + " anymore";
                 }
@@ -570,26 +590,70 @@ app.get("/history.html", function (req, res) {
     } else {
         connection.query("SELECT * FROM history WHERE visited =?", [req.session.username], function (err, rows) {
             if (err) throw err;
-            for (var k in rows) {
-                (function (k, callback) {
-                    connection.query("SELECT * FROM users WHERE username = ?", [rows[k].visitor], function (err, row) {
-                        if (err) throw err;
-                        else {
-                            infos[k] = row[0];
-                            infos[k].class = (Number(k) % 2) + 1;
-                            infos[k].birth = profile.age(row[0].birthday);
-                            if (!rows[Number(k) + 1]) {
-                                callback();
+            if (rows[0]) {
+                for (var k in rows) {
+                    (function (k, callback) {
+                        connection.query("SELECT * FROM users WHERE username = ?", [rows[k].visitor], function (err, row) {
+                            if (err) throw err;
+                            else {
+                                infos[k] = row[0];
+                                infos[k].class = (Number(k) % 2) + 1;
+                                infos[k].birth = profile.age(row[0].birthday);
+                                if (!rows[Number(k) + 1]) {
+                                    callback();
+                                }
                             }
-                        }
+                        });
+                    })(k, function () {
+                        res.render("history.html", {
+                            homepage: {
+                                infos: infos
+                            }
+                        })
                     });
-                })(k, function () {
-                    res.render("history.html", {
-                        homepage: {
-                            infos: infos
-                        }
-                    })
-                });
+                }
+            } else {
+                res.render("history.html", {
+                    message: "Nobody have visited your profil"
+                })
+            }
+        })
+    }
+});
+
+app.get("/followers.html", function (req, res) {
+    var infos = [];
+    if (!req.session.username) {
+        res.redirect("/");
+    } else {
+        connection.query("SELECT * FROM liking WHERE liked =?", [req.session.username], function (err, rows) {
+            if (err) throw err;
+            if (rows[0]) {
+                for (var k in rows) {
+                    (function (k, callback) {
+                        connection.query("SELECT * FROM users WHERE username = ?", [rows[k].liker], function (err, row) {
+                            if (err) throw err;
+                            else {
+                                infos[k] = row[0];
+                                infos[k].class = (Number(k) % 2) + 1;
+                                infos[k].birth = profile.age(row[0].birthday);
+                                if (!rows[Number(k) + 1]) {
+                                    callback();
+                                }
+                            }
+                        });
+                    })(k, function () {
+                        res.render("followers.html", {
+                            homepage: {
+                                infos: infos
+                            }
+                        })
+                    });
+                }
+            } else {
+                res.render("followers.html", {
+                    message: "Nobody liked your profil"
+                })
             }
         })
     }
