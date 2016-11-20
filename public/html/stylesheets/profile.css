@@ -111,7 +111,6 @@
     width: 100%;
     max-width: 990px;
     background: white;
-    height: 50px;
     line-height: 50px;
     border-top-left-radius: 20px;
     border-top-right-radius: 20px;
@@ -209,4 +208,12 @@
     .usr-set {
         margin-top: 10px;
     }
+}
+
+#phrasepicture {
+    width: 400px;
+    align: center;
+    color: rgb(145, 145, 145);
+    margin-left: 150px;
+    display: inline-block;
 }

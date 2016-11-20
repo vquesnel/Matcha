@@ -13,7 +13,8 @@
 </head>
 
 <body>
-    <div class="menu"> <img id="menu-logo" src="img/mini-logo.png" alt="mini-logo">
+    <div class="menu">
+        <a href="match.html"><img id="menu-logo" src="img/mini-logo.png" alt="mini-logo"></a>
         <a href="#"><img class="menu-img" src="img/feed.png"></a>
         <a href="profile.html"><img class="menu-img" src="/img/account.png"></a>
         <a href="message.html"><img class="menu-img" src="/img/envelope.png"></a>
@@ -24,8 +25,10 @@
     <div class="separator"></div>
     <div class="separator"></div>
     <div class="site-content" align="center">
+        {{#profile.infos}}
         <div class="usr" id="usr"> <img id="usr-pic" width="200" height="200" src="{{profil_pic}}" alt="user photo">
             <div id="usr-info" class="usr-info" align="left">
+
                 <div class="usr-name">{{firstname}} {{lastname}}
                     <br>
                     <div class="usr-age">{{birth}} ans {{location}}</div>
@@ -36,12 +39,17 @@
                 <div class="usr-score">{{pop}}<img src="img/love-1.png" alt="user-score"></div>
             </div>
         </div>
+        {{/profile.infos}}
         <div class="top-bar" align="left"> <a href="followers.html" class="input d1">Followers</a> <a href="history.html" class="input d1">History</a>
+            <div id="phrasepicture">To Change your profil picture click on your favorite one</div>
             <div class="reglage">
                 <a href="edit_profil.html"><img src="img/cogwheel.png"></a>
+                <a href="edit_account.html"><img src="img/locked.png"></a>
             </div>
         </div>
-        <div id="my_pictures" class="usr-set">{{#pics0}} <img class="usr-set-img" src="{{pics0}}" alt="user-images" onclick="Changeprofile_pic(this)"> {{/pics0}} {{^pics0}}{{/pics0}} {{#pics1}}<img class="usr-set-img" src="{{pics1}}" alt="user-images" onclick="Changeprofile_pic(this)"> {{/pics1}} {{^pics1}}{{/pics1}} {{#pics2}}<img class="usr-set-img" src="{{pics2}}" alt="user-images" onclick="Changeprofile_pic(this)"> {{/pics2}} {{^pics2}}{{/pics2}} {{#pics3}}<img class="usr-set-img" src="{{pics3}}" alt="user-images" onclick="Changeprofile_pic(this)">{{/pics3}} {{^pics3}}{{/pics3}}</div>
+        <div id="my_pictures" class="usr-set">
+            {{>display_pictures}}
+        </div>
         <div class="bottom-bar" align="left">
             <div class="signaler"><a href="#">Signaler ce compte</a></div>
         </div>

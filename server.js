@@ -32,6 +32,15 @@ var sess = {
     resave: false,
     saveUninitialized: false
 }
+
+var mailer = require('nodemailer');
+var smtpTransport = mailer.createTransport('SMTP', {
+    service: 'Gmail',
+    auth: {
+        user: 'noreply.matcha@gmail.com',
+        pass: 'zdpzdpzdp'
+    }
+});
 var multer = require('multer');
 var storage = multer.diskStorage({
     destination: function (req, file, callback) {
@@ -42,16 +51,23 @@ var storage = multer.diskStorage({
     }
 });
 var upload = multer({
-    storage: storage
+    storage: storage,
+    fileFilter: function (req, file, cb) {
+        if (file.mimetype !== 'image/png' && file.mimetype !== 'image/jpeg' && file.mimetype !== 'image/jpeg') {
+            req.fileValidationError = 'goes wrong on the mimetype';
+            return cb(null, false, new Error('goes wrong on the mimetype'));
+        }
+        cb(null, true);
+    }
 }).single('userPhoto');
 /*     S Q L    C  O  N  N  E  X  I  O  N  S    */
 connection.connect(function (err) {
     if (err) throw err;
 });
 connection.query("CREATE DATABASE IF NOT EXISTS matcha;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`users` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(255) NOT NULL , `lastname` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `birthday` DATE NOT NULL , `email` VARCHAR(255) NOT NULL , `password` VARCHAR(255) NOT NULL , `sexe` VARCHAR(8) NOT NULL , `token` VARCHAR(255) NOT NULL , `validation` VARCHAR(1) NOT NULL DEFAULT '0' ,  `profil_pic` LONGTEXT DEFAULT NULL, `sexual_or` VARCHAR(10) NOT NULL DEFAULT 'bi' , `bio` VARCHAR(255) DEFAULT NULL , `location` VARCHAR(255) DEFAULT NULL , `tags` VARCHAR(255) DEFAULT NULL , `pop` INT(5) DEFAULT '0', login VARCHAR(255), PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`users` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(255) NOT NULL , `lastname` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `birthday` DATE NOT NULL , `email` VARCHAR(255) NOT NULL , `password` VARCHAR(255) NOT NULL , `sexe` VARCHAR(8) NOT NULL , `token` VARCHAR(255) NOT NULL , `validation` VARCHAR(1) NOT NULL DEFAULT '0' ,  `profil_pic` LONGTEXT DEFAULT NULL, `sexual_or` VARCHAR(10) NOT NULL DEFAULT 'bi' , `bio` VARCHAR(255) DEFAULT NULL , `location` VARCHAR(255) DEFAULT NULL , `tags` VARCHAR(255) DEFAULT NULL , `pop` INT(5) DEFAULT '0', login VARCHAR(255), `sessionID` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`pictures` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `pic` LONGTEXT NOT NULL , `username` VARCHAR(255) NOT NULL,  PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`history` ( `visitor` VARCHAR(255) NOT NULL , `visited` VARCHAR(255) NOT NULL ) ENGINE = InnoDB;")
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`history` ( `visitor` VARCHAR(255) NOT NULL , `visited` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;")
 connection.query("use matcha");
 /*     P  A  G  E  S      R  E  Q  U  E  S  T  S     -     E X P R E S S     */
 app.engine('html', mustacheExpress());
@@ -80,14 +96,15 @@ app.post('/', function (req, res) {
                         message: "Sorry wrong password"
                     })
                 } else {
-                    connection.query("UPDATE users SET token = ? WHERE username = ?", [req.sessionID, req.body.username], function (err) {
+                    connection.query("UPDATE users SET sessionID = ? WHERE username = ?", [req.sessionID, req.body.username], function (err) {
                         if (err) throw err;
                     })
                     req.session.username = rows[0].username;
                     req.session.sexual_or = rows[0].sexual_or;
                     req.session.sexe = rows[0].sexe;
                     req.session.profil_pic = rows[0].profil_pic;
-                    console.error("id de " + req.session.username + " == " + req.sessionID);
+                    req.session.email = rows[0].email;
+                    req.session.token = rows[0].token;
                     connection.query("UPDATE users SET login = ? WHERE username = ?", ["online", req.session.username], function (err) {
                         if (err) throw err;
                     })
@@ -179,6 +196,10 @@ app.post('/create_account.html', function (req, res) {
 app.get('/edit_profil.html', function (req, res) {
     if (!req.session.username) {
         res.redirect("/");
+    } else if (!req.session.profil_pic) {
+        res.render("edit_profil.html", {
+            messagephoto: "You need a profil picture to continue"
+        })
     } else {
         connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
             if (err) throw err;
@@ -196,82 +217,131 @@ app.get('/edit_profil.html', function (req, res) {
         });
     }
 });
-app.post('/edit_profil.html', function (req, res) {
+app.post('/upload', function (req, res) {
     var infos = {};
-    upload(req, res, function (err) {
-        if (req.file) {
-            if (err) {
-                infos.message = "An error occurs while uploading your picture";
-            } else {
-                req.file.path = req.file.path.replace("public/", "");
-                connection.query("SELECT profil_pic FROM users WHERE username = ?", [req.session.username], function (err, rows) {
-                    if (err) throw err;
-                    req.session.profil_pic = rows[0].profil_pic;
-                    if (!rows[0].profil_pic) {
-                        connection.query("UPDATE users SET profil_pic = ? WHERE username = ?", [req.file.path, req.session.username], function (err) {
-                            if (err) throw err;
-                        })
-                        req.session.profil_pic = req.file.path
-                    }
-                })
-                connection.query("SELECT * FROM pictures WHERE username = ?", [req.session.username], function (err, rows) {
-                    if (err) throw err
-                    if (rows.length < 5) {
-                        connection.query("INSERT INTO pictures(pic, username) VALUES (?,?)", [req.file.path, req.session.username], function (err) {
-                            if (err) throw err;
-                        })
-                    }
-                })
-                infos.message = "File is uploaded";
-                infos.link = "profile.html";
-                infos.text = "Show my profil";
-            }
-        }
-        if (req.body.preferences) {
-            connection.query("UPDATE users SET tags = CONCAT(IFNULL(tags, ''), CONCAT(' ',?)) WHERE username = ?", [req.body.preferences, req.session.username], function (err) {
-                if (err) throw err;
-            })
-            infos.message = "Profil has been updated";
-        }
-        if (req.body.bio) {
-            connection.query("UPDATE users SET bio = ? WHERE username = ?", [req.body.bio, req.session.username], function (err) {
-                if (err) throw err;
-            })
-            infos.message = "Profil has been updated";
-        }
-        if (req.body.location) {
-            connection.query("UPDATE users SET location = ? WHERE username = ?", [req.body.location, req.session.username], function (err) {
-                if (err) throw err;
-            })
-            infos.message = "Profil has been updated";
-        }
-        if (req.body.orientation) {
-            connection.query("UPDATE users SET sexual_or = ? WHERE username = ?", [req.body.orientation, req.session.username], function (err) {
-                if (err) throw err;
-            })
-            infos.message = "Profil has been updated";
-        }
-
-    }, connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
+    connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
         if (err) throw err;
         else {
-            console.log(rows[0]);
-            if (!rows[0].profil_pic) {
-                infos.message = "Profil has been updated but you need a profil picture to continue";
-                res.render('edit_profil.html', infos);
-            } else {
-                req.session.profil_pic = rows[0].profil_pic;
-                res.render('edit_profil.html', infos);
-            }
+            req.session.profil_pic = rows[0].profil_pic;
         }
-    }));
-    //console.log(req.session);
+    });
+    upload(req, res, function (err) {
+        if (req.fileValidationError) {
+            infos.messagephoto = 'Wrong file type : File not uploaded';
+        }
+        if (req.file) {
+            if (err) {
+                infos.messagephoto = 'A problem occurs : File not uploaded';
+            } else {
+                req.file.path = req.file.path.replace('public/', '');
+                if (!req.session.profil_pic) {
+                    connection.query("UPDATE users SET profil_pic = ? WHERE username = ?", [req.file.path, req.session.username], function (err) {
+                        if (err) throw err;
+                    })
+                    req.session.profil_pic = req.file.path;
+                }
+                connection.query("SELECT * FROM pictures WHERE username = ?", [req.session.username], function (err, rows) {
+                    if (err) throw err;
+                    if (rows.length < 5) {
+                        connection.query("INSERT INTO pictures(pic, username) VALUES(?,?)", [req.file.path, req.session.username], function (err) {
+                            if (err) throw err;
+                        })
+                        infos.messagephoto = 'File uploaded';
+                    } else {
+                        infos.message = "You can have only 5 pictures";
+
+                    }
+                })
+
+            }
+            connection.query("SELECT * FROM pictures WHERE username = ?", [req.session.username], function (err, rows) {
+                if (err) throw err;
+                for (var k in rows) {
+                    infos['pics' + k + ''] = rows[k].pic;
+                }
+                if (k) {
+                    var j = Number(k) + 1;
+                } else {
+                    j = 0;
+                }
+                infos['pics' + j] = req.file.path;
+                res.render('edit_profil.html', infos);
+            });
+
+        } else {
+            connection.query("SELECT * FROM pictures WHERE username = ?", [req.session.username], function (err, rows) {
+                if (err) throw err;
+                for (var k in rows) {
+                    infos['pics' + k + ''] = rows[k].pic;
+                }
+                infos.messagephoto = "You haven't select a picture";
+                res.render('edit_profil.html', infos);
+            });
+        }
+
+    });
+
+});
+app.post('/update', function (req, res) {
+    var infos = {};
+    if (req.body.preferences) {
+        connection.query("UPDATE users SET tags = CONCAT(IFNULL(tags, ''), CONCAT(' ',?)) WHERE username = ?", [req.body.preferences, req.session.username], function (err) {
+            if (err) throw err;
+        })
+        infos.messageprofil = "Profil has been updated";
+    }
+    if (req.body.bio) {
+        connection.query("UPDATE users SET bio = ? WHERE username = ?", [req.body.bio, req.session.username], function (err) {
+            if (err) throw err;
+        })
+        infos.messageprofil = "Profil has been updated";
+    }
+    if (req.body.location) {
+        connection.query("UPDATE users SET location = ? WHERE username = ?", [req.body.location, req.session.username], function (err) {
+            if (err) throw err;
+        })
+        infos.messageprofil = "Profil has been updated";
+    }
+    if (req.body.orientation) {
+        connection.query("UPDATE users SET sexual_or = ? WHERE username = ?", [req.body.orientation, req.session.username], function (err) {
+            if (err) throw err;
+        })
+        infos.messageprofil = "Profil has been updated";
+    }
+
+    if (!req.session.profil_pic) {
+        infos.messageprofil = "Profil has been updated but you need a profil picture to continue";
+        res.render('edit_profil.html', infos);
+    } else {
+        res.render('edit_profil.html', infos);
+    }
+
 });
 app.get('/match.html', function (req, res) {
     if (!req.session.username) {
         res.redirect("/");
     } else {
-        res.render("match.html", {})
+        connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
+            if (err) throw err;
+            if (!rows[0].profil_pic) {
+                res.redirect("/edit_profil.html");
+            } else {
+                connection.query("SELECT * FROM users", function (err, rows) {
+                    if (err) throw err;
+                    else {
+                        for (var k in rows) {
+                            rows[k].class = (Number(k) % 2) + 1;
+                            rows[k].birth = profile.age[k].birthday;
+                        }
+                        res.render("match.html", {
+                            homepage: {
+                                infos: rows
+                            }
+                        })
+                    }
+                })
+            }
+        })
     }
 });
 app.get('/profile.html', function (req, res) {
@@ -281,21 +351,20 @@ app.get('/profile.html', function (req, res) {
         connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
             if (err) throw err;
             if (!rows[0].profil_pic) {
-                // console.log(rows[0].profile_pic);
                 res.redirect("/edit_profil.html");
             } else {
-                if (err) throw err;
-                var birth = profile.age(rows[0].birthday);
                 var infos = rows[0];
-                infos.birth = birth;
-                connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.session.username, rows[0].profil_pic], function (err, rows) {
+                infos.birth = profile.age(rows[0].birthday);
+                connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.session.username, rows[0].profil_pic], function (err, row) {
                     if (err) throw err;
-                    //console.log(rows);
-                    for (var k in rows) {
-                        infos['pics' + k + ''] = rows[k].pic;
-                    }
-                    //console.log(infos);
-                    res.render("profile.html", infos);
+                    res.render("profile.html", {
+                        profile: {
+                            infos: infos
+                        },
+                        display_pictures: {
+                            infos: row
+                        }
+                    });
                 })
             }
         })
@@ -310,7 +379,6 @@ app.get('/users.html/:user', function (req, res) {
         } else {
             connection.query("SELECT * FROM history WHERE visitor = ? AND visited = ?", [req.session.username, req.params.user], function (err, rows) {
                 if (err) throw err;
-                // console.log(rows);
                 if (!rows[0]) {
                     connection.query("UPDATE users SET pop = pop + 2 WHERE username = ?", [req.params.user], function (err) {
                         if (err) throw err;
@@ -331,50 +399,158 @@ app.get('/users.html/:user', function (req, res) {
                     infos.birth = profile.age(rows[0].birthday);
 
                 }
-                connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, rows) {
+                connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
                     if (err) throw err;
-                    for (var k in rows) {
-                        infos['pics' + k + ''] = rows[k].pic;
-                    }
-                    res.render('users.html', infos);
+                    res.render('users.html', {
+                        users: {
+                            infos: infos
+                        },
+                        display_pictures_users: {
+                            infos: row
+                        }
+
+                    });
                 });
             });
         }
     }
 });
 app.post("/users.html/:user", function (req, res) {
-    connection.query("SELECT * FROM users WHERE username = ?", [req.params.user], function (err, rows) {
-        if (err) throw err;
-        console.log(rows);
-        if (!rows.length) {
-            res.redirect('/match.html');
-        } else {
-            var infos = rows[0];
-            var pov = req.body.pov;
-            if (pov === "follow") {
-                connection.query("UPDATE users SET pop =pop + 5 WHERE username = ?", [req.params.user], function (err) {
-                    if (err) throw err;
-                })
-                infos.follow = "you like " + rows[0].firstname + "";
-            } else if (pov === "unfollow") {
-                connection.query("UPDATE users SET pop = pop - 5 WHERE username = ?", [req.params.user], function (err) {
-                    if (err) throw err;
-                })
-                infos.follow = "you do not like " + rows[0].firstname + " anymore";
-            }
-            infos.birth = profile.age(rows[0].birthday);
-            connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, rows) {
-                if (err) throw err;
-                for (var k in rows) {
-                    infos['pics' + k + ''] = rows[k].pic;
+    if (!req.session.username) {
+        res.redirect('/');
+    } else {
+        connection.query("SELECT * FROM users WHERE username = ?", [req.params.user], function (err, rows) {
+            if (err) throw err;
+            if (!rows.length) {
+                res.redirect('/match.html');
+            } else {
+                var infos = rows[0];
+                var pov = req.body.pov;
+                if (pov === "follow") {
+                    connection.query("UPDATE users SET pop =pop + 5 WHERE username = ?", [req.params.user], function (err) {
+                        if (err) throw err;
+                    })
+                    infos.follow = "you like " + rows[0].firstname + "";
+                } else if (pov === "unfollow") {
+                    connection.query("UPDATE users SET pop = pop - 5 WHERE username = ?", [req.params.user], function (err) {
+                        if (err) throw err;
+                    })
+                    infos.follow = "you do not like " + rows[0].firstname + " anymore";
                 }
-                res.render('users.html', infos)
-            });
+                infos.birth = profile.age(rows[0].birthday);
+                connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
+                    if (err) throw err;
+
+                    res.render('users.html', {
+                        users: {
+                            infos: infos
+                        },
+                        display_pictures_users: {
+                            infos: row
+                        }
+
+                    });
 
 
+
+                })
+            }
+        })
+    }
+});
+app.get('/change_password.html/:token/:username', function (req, res) {
+    if (!req.params.token || !req.params.username)
+        res.redirect('/');
+    else {
+        connection.query("SELECT token FROM users WHERE username = ?", [req.params.username], function (err, rows) {
+            if (err) throw err;
+            if (rows.length && rows[0].token === req.params.token) {
+                req.session.guest = req.params.username;
+                res.redirect('/change_password.html')
+            } else if (req.session.username) {
+                res.redirect('/profile.html')
+            } else {
+                res.redirect('/')
+            }
+        })
+    }
+});
+
+app.get('/change_password.html', function (req, res) {
+    if (req.session.guest) {
+        res.render('change_password.html')
+    } else {
+        res.redirect('/')
+    }
+});
+
+app.get('/reset_password.html', function (req, res) {
+    res.render('reset_password.html')
+});
+app.post('/reset_password.html', function (req, res) {
+    if (req.body.sendMail) {
+        connection.query("SELECT * FROM users WHERE email = ?", [req.body.sendMail], function (err, rows) {
+            if (err) throw err;
+            else {
+                if (rows.length) {
+                    var mail = {
+                        from: 'noreply@matcha.com',
+                        to: req.body.sendMail,
+                        subject: 'Changing password',
+                        html: '<p>Hello ' + rows[0].firstname + '</p><br><p>To change your password please click on the link below:</p><br><a href="https://localhost:4433/change_password.html/' + rows[0].token + '/' + rows[0].username + '">Change password</a>'
+                    }
+                    smtpTransport.sendMail(mail, function (error, response) {
+                        if (error) {
+                            res.render('reset_password.html', {
+                                'message': 'A problem occurs : Sending email failed'
+                            })
+                        } else {
+                            res.render('reset_password.html', {
+                                'message': 'Email sended'
+                            })
+                        }
+                        smtpTransport.close();
+                    });
+                } else {
+                    res.render('reset_password.html', {
+                        message: 'Email not registred'
+                    })
+                }
+            }
+        })
+    } else {
+        res.render('reset_password.html', {
+            message: 'Please type your email'
+        })
+    }
+});
+
+app.post('/change_password.html', function (req, res) {
+    var ret = '';
+    if (req.body.new && req.body.confirmation) {
+        if (req.body.new === req.body.confirmation) {
+            connection.query("UPDATE users SET password = ? WHERE username = ?", [md5(req.body.confirmation), req.session.guest], function (err) {
+                if (err) throw err;
+                else {
+                    connection.query("UPDATE users SET token = ? WHERE username = ?", [uniqid(), req.session.guest], function (err) {
+                        if (err) throw err;
+                    })
+                }
+            })
+            ret = 'Password Updated';
+        } else {
+            ret = 'Passwords doesn\'t match';
         }
+    } else {
+        ret = 'Please fill all the fields';
+    }
+    req.session.guest.destroy;
+    res.render('change_password.html', {
+        message: ret
     })
 });
+
+
 app.get("/logout.html", function (req, res) {
     if (!req.session.username) {
         res.redirect("/");
@@ -386,25 +562,95 @@ app.get("/logout.html", function (req, res) {
         res.redirect("/");
     }
 });
+
 app.get("/history.html", function (req, res) {
-    var infos = {};
+    var infos = [];
     if (!req.session.username) {
         res.redirect("/");
     } else {
         connection.query("SELECT * FROM history WHERE visited =?", [req.session.username], function (err, rows) {
             if (err) throw err;
-            // console.log(rows);
             for (var k in rows) {
-                connection.query("SELECT * FROM users WHERE username = ?", [rows[k].visitor], function (err, rows) {
-                    if (err) throw err;
-                    infos[k] = rows;
-                    console.log(infos);
+                (function (k, callback) {
+                    connection.query("SELECT * FROM users WHERE username = ?", [rows[k].visitor], function (err, row) {
+                        if (err) throw err;
+                        else {
+                            infos[k] = row[0];
+                            infos[k].class = (Number(k) % 2) + 1;
+                            infos[k].birth = profile.age(row[0].birthday);
+                            if (!rows[Number(k) + 1]) {
+                                callback();
+                            }
+                        }
+                    });
+                })(k, function () {
+                    res.render("history.html", {
+                        homepage: {
+                            infos: infos
+                        }
+                    })
                 });
             }
-            //console.log(infos);
         })
     }
-
+});
+app.get('/edit_account.html', function (req, res) {
+    if (!req.session.username) {
+        res.redirect('/');
+    } else {
+        res.render('edit_account.html', {
+            email: req.session.email
+        })
+    }
+});
+app.post('/edit_account.html', function (req, res) {
+    if (req.body.sendEmail) {
+        var mail = {
+            from: 'noreply.matcha@gmail.com',
+            to: req.session.email,
+            subject: 'Changing password',
+            html: '<p>Hello ' + req.session.firstname + '</p><br><p>To change your password please click on the link below:</p><br><a href="https://localhost:4433/change_password.html/' + req.session.token + '/' + req.session.username + '">Change password</a>'
+        }
+        smtpTransport.sendMail(mail, function (error, response) {
+            if (error) {
+                res.render('edit_account.html', {
+                    'message': 'A problem occurs : Sending email failed'
+                })
+            } else {
+                res.render('edit_account.html', {
+                    'message': 'Email sended'
+                })
+            }
+            smtpTransport.close();
+        });
+    }
+    if (req.body.new_email) {
+        var regEmail = new RegExp('^[0-9a-z._-]+@{1}[0-9a-z.-]{2,}[.]{1}[a-z]{2,5}$', 'i');
+        if (!regEmail.test(req.body.new_email)) {
+            res.render('edit_account.html', {
+                message: 'Invalid email format',
+                email: req.session.email
+            })
+        }
+        connection.query("SELECT * FROM users WHERE email = ?", [req.body.new_email], function (err, rows) {
+            if (err) throw err;
+            if (rows[0]) {
+                res.render("edit_account.html", {
+                    email: req.session.email,
+                    message: 'This email is alreday use'
+                })
+            } else {
+                connection.query("UPDATE users SET email = ? WHERE username = ?", [req.body.new_email, req.session.username], function (err) {
+                    if (err) throw err;
+                });
+                req.session.email = req.body.new_email;
+                res.render('edit_account.html', {
+                    message: 'Email updated',
+                    email: req.session.email
+                })
+            }
+        })
+    }
 });
 /*     S  E  R  V  E  R     */
 var httpsServer = https.createServer(options, app, function (req, res) {
@@ -414,7 +660,6 @@ httpsServer.listen(4433);
 /*     S  O  C  K  E  T     */
 var io = require('socket.io')(httpsServer);
 io.sockets.on('connection', function (socket) {
-    //  console.log(socket.handshake.headers.cookie);
     socket.on("changeprofile_pic", function (data) {
         data.picture = data.picture.replace("https://localhost:4433/", "");
         var username = data.picture.replace("upload/", "");
@@ -432,14 +677,12 @@ io.sockets.on('connection', function (socket) {
             connection.query("SELECT profil_pic FROM users WHERE profil_pic = ? AND username = ? ", [data.picture, username], function (err, rows) {
                 if (err) throw err;
                 if (rows.length) {
-                    console.log("WESSSSSSSH");
                     connection.query("UPDATE users SET profil_pic = DEFAULT WHERE username = ?", [username], function (err) {
                         if (err) throw err;
                     })
                 }
             });
         })
-        socket.emit("erase", data.picture);
         fs.unlinkSync("./public/" + data.picture + "");
     });
 });
