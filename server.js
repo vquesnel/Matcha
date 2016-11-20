@@ -60,6 +60,7 @@ var upload = multer({
         cb(null, true);
     }
 }).single('userPhoto');
+var sharp = require('sharp');
 /*     S Q L    C  O  N  N  E  X  I  O  N  S    */
 connection.connect(function (err) {
     if (err) throw err;
@@ -228,6 +229,7 @@ app.post('/upload', function (req, res) {
         }
     });
     upload(req, res, function (err) {
+        var cropped = 'upload/' + req.session.username + '-' + uniqid() + '.png';
         if (req.fileValidationError) {
             infos.messagephoto = 'Wrong file type : File not uploaded';
         }
@@ -235,17 +237,23 @@ app.post('/upload', function (req, res) {
             if (err) {
                 infos.messagephoto = 'A problem occurs : File not uploaded';
             } else {
-                req.file.path = req.file.path.replace('public/', '');
+                sharp(req.file.path).resize(500, 500).toFile('public/' + cropped, function (err) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        fs.unlink(req.file.path)
+                    }
+                });
                 if (!req.session.profil_pic) {
-                    connection.query("UPDATE users SET profil_pic = ? WHERE username = ?", [req.file.path, req.session.username], function (err) {
+                    connection.query("UPDATE users SET profil_pic = ? WHERE username = ?", [cropped, req.session.username], function (err) {
                         if (err) throw err;
                     })
-                    req.session.profil_pic = req.file.path;
+                    req.session.profil_pic = cropped;
                 }
                 connection.query("SELECT * FROM pictures WHERE username = ?", [req.session.username], function (err, rows) {
                     if (err) throw err;
                     if (rows.length < 5) {
-                        connection.query("INSERT INTO pictures(pic, username) VALUES(?,?)", [req.file.path, req.session.username], function (err) {
+                        connection.query("INSERT INTO pictures(pic, username) VALUES(?,?)", [cropped, req.session.username], function (err) {
                             if (err) throw err;
                         })
                         infos.messagephoto = 'File uploaded';
@@ -266,7 +274,7 @@ app.post('/upload', function (req, res) {
                 } else {
                     j = 0;
                 }
-                infos['pics' + j] = req.file.path;
+                infos['pics' + j] = cropped;
                 res.render('edit_profil.html', infos);
             });
 

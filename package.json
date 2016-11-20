@@ -1,45 +1,46 @@
 {
-    "name": "matcha_reloaded",
-    "version": "1.0.0",
-    "description": "matcha_work",
-    "main": "server.js",
-    "dependencies": {
-        "body-parser": "^1.15.2",
-        "cookie-parser": "^1.4.3",
-        "express": "^4.14.0",
-        "express-session": "^1.14.2",
-        "fs": "^0.0.1-security",
-        "http-server": "^0.9.0",
-        "https": "^1.0.0",
-        "https-server": "^0.1.2",
-        "md5": "^2.2.1",
-        "moment": "^2.16.0",
-        "multer": "^1.2.0",
-        "mustache": "^2.3.0",
-        "mustache-express": "^1.2.2",
-        "mysql": "^2.12.0",
-        "node": "*",
-        "nodemailer": "0.7.1",
-        "nodemon": "^1.11.0",
-        "path": "^0.12.7",
-        "pug": "^2.0.0-beta6",
-        "socket.io": "^1.5.1",
-        "tls": "^0.0.1",
-        "uniqid": "^4.1.0"
-    },
-    "devDependencies": {},
-    "scripts": {
-        "test": "echo \"Error: no test specified\" && exit 1",
-        "start": "node server.js"
-    },
-    "repository": {
-        "type": "git",
-        "url": "git+https://github.com/vquesnel/Matcha.git"
-    },
-    "author": "",
-    "license": "ISC",
-    "bugs": {
-        "url": "https://github.com/vquesnel/Matcha/issues"
-    },
-    "homepage": "https://github.com/vquesnel/Matcha#readme"
+  "name": "matcha_reloaded",
+  "version": "1.0.0",
+  "description": "matcha_work",
+  "main": "server.js",
+  "dependencies": {
+    "body-parser": "^1.15.2",
+    "cookie-parser": "^1.4.3",
+    "express": "^4.14.0",
+    "express-session": "^1.14.2",
+    "fs": "^0.0.1-security",
+    "http-server": "^0.9.0",
+    "https": "^1.0.0",
+    "https-server": "^0.1.2",
+    "md5": "^2.2.1",
+    "moment": "^2.16.0",
+    "multer": "^1.2.0",
+    "mustache": "^2.3.0",
+    "mustache-express": "^1.2.2",
+    "mysql": "^2.12.0",
+    "node": "*",
+    "nodemailer": "0.7.1",
+    "nodemon": "^1.11.0",
+    "path": "^0.12.7",
+    "pug": "^2.0.0-beta6",
+    "sharp": "^0.16.2",
+    "socket.io": "^1.5.1",
+    "tls": "^0.0.1",
+    "uniqid": "^4.1.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/vquesnel/Matcha.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/vquesnel/Matcha/issues"
+  },
+  "homepage": "https://github.com/vquesnel/Matcha#readme"
 }
