@@ -69,8 +69,9 @@ connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`users` ( `id` INT(5) NOT 
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`pictures` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `pic` LONGTEXT NOT NULL , `username` VARCHAR(255) NOT NULL,  PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`history` ( `visitor` VARCHAR(255) NOT NULL , `visited` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`liking` ( `liker` VARCHAR(255) NOT NULL , `liked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`reports` ( `repoter` VARCHAR(255) NOT NULL , `reported` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`reports` ( `reporter` VARCHAR(255) NOT NULL , `reported` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`tags` ( `tag` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`matchs` ( `matcher` VARCHAR(255) NOT NULL , `matched` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("use matcha");
 /*     P  A  G  E  S      R  E  Q  U  E  S  T  S     -     E X P R E S S     */
 app.engine('html', mustacheExpress());
@@ -260,7 +261,7 @@ app.post('/upload', function (req, res) {
 				sharp(req.file.path).resize(500, 500).toFile('public/' + cropped, function (err) {
 					if (err) throw err;
 					else {
-						fs.unlink(req.file.path)
+						fs.unlinkSync(req.file.path);
 					}
 				});
 				if (!req.session.profil_pic) {
@@ -303,7 +304,6 @@ app.post('/upload', function (req, res) {
 		else {
 			connection.query("SELECT * FROM pictures WHERE username = ?", [req.session.username], function (err, rows) {
 				if (err) throw err;
-				for (var k in rows) {};
 				infos.messagephoto = "You haven't select a picture";
 				res.render('edit_profil.html', {
 					edit_profil: {
@@ -323,6 +323,22 @@ app.post('/update', function (req, res) {
 	(function (callback) {
 		if (req.body.preferences) {
 			var res = req.body.preferences.split(" ");
+			var results = create_account.find_duplicates(res);
+			console.log(results);
+			for (var k in results) {
+				(function (k) {
+					connection.query("SELECT * FROM tags WHERE tag = ? AND username = ?", [results[k], req.session.username], function (err, rows) {
+						if (err) throw err;
+						if (results[k]) {
+							if (!rows[0]) {
+								connection.query("INSERT INTO tags(tag, username) VALUES(?,?)", [results[k], req.session.username], function (err) {
+									if (err) throw err;
+								})
+							}
+						}
+					})
+				})(k);
+			}
 			infos.messageprofil = "Profil has been updated";
 		}
 		if (req.body.bio) {
@@ -458,15 +474,27 @@ app.get('/users.html/:user', function (req, res) {
 				else {
 					var infos = rows[0];
 					infos.birth = profile.age(rows[0].birthday);
-					connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
+					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, data) {
 						if (err) throw err;
-						res.render('users.html', {
-							users: {
-								infos: infos
-							}
-							, display_pictures_users: {
-								infos: row
-							}
+						connection.query("SELECT * FROM matchs WHERE (matcher = ? AND matched = ?) OR (matcher = ? AND matched = ?)", [req.session.username, req.params.user, req.params.user, req.session.username], function (err, match) {
+							connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
+								if (err) throw err;
+								console.log(infos);
+								if (data[0]) {
+									infos.follow = "you like " + rows[0].firstname;
+								}
+								if (match[0]) {
+									infos.follow = "you match with " + rows[0].firstname;
+								}
+								res.render('users.html', {
+									users: {
+										infos: infos
+									}
+									, display_pictures_users: {
+										infos: row
+									}
+								});
+							});
 						});
 					});
 				}
@@ -494,12 +522,27 @@ app.post("/users.html/:user", function (req, res) {
 							connection.query("INSERT INTO liking(liker, liked) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
 								if (err) throw err;
 							});
-							connection.query("UPDATE users SET pop =pop + 5 WHERE username = ?", [req.params.user], function (err) {
+							connection.query("UPDATE users SET pop = pop + 5 WHERE username = ?", [req.params.user], function (err) {
 								if (err) throw err;
 							})
 						}
 					})
-					infos.follow = "you like " + rows[0].firstname + "";
+					infos.follow = "you like " + rows[0].firstname;
+					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.params.user, req.session.username], function (err, rows) {
+						if (err) throw err;
+						if (!rows[0]) {
+							connection.query("INSERT INTO matchs(matcher, matched) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
+								if (err) throw err;
+							});
+							connection.query("UPDATE users SET pop = pop + 10 WHERE username = ?", [req.params.user], function (err) {
+								if (err) throw err;
+							})
+							connection.query("UPDATE users SET pop = pop + 10 WHERE username = ?", [req.session.username], function (err) {
+								if (err) throw err;
+							})
+						}
+					})
+					infos.follow = "you match with " + rows[0].firstname;
 				}
 				else if (pov === "unfollow") {
 					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, rows) {
@@ -513,7 +556,32 @@ app.post("/users.html/:user", function (req, res) {
 							})
 						}
 					})
+					connection.query("SELECT * FROM matchs WHERE (matcher = ? AND matched = ?) OR (matcher = ? AND matched = ?)", [req.session.username, req.params.user, req.params.user, req.session.username], function (err, rows) {
+						if (err) throw err;
+						if (rows[0]) {
+							connection.query("DELETE FROM matchs WHERE  (matcher = ? AND matched = ?) OR (matcher = ? AND matched = ?)", [req.session.username, req.params.user, req.params.user, req.session.username], function (err) {
+								if (err) throw err;
+							});
+							connection.query("UPDATE users SET pop =pop - 10 WHERE username = ?", [req.params.user], function (err) {
+								if (err) throw err;
+							})
+						}
+					})
 					infos.follow = "you do not like " + rows[0].firstname + " anymore";
+				}
+				else if (pov === "reported") {
+					connection.query("SELECT * FROM reports WHERE reporter = ? AND reported = ?", [req.session.username, req.params.user], function (err, rows) {
+						if (err) throw err;
+						if (!rows[0]) {
+							connection.query("INSERT INTO reports(reporter, reported) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
+								if (err) throw err;
+							});
+							connection.query("UPDATE users SET pop = pop - 5 WHERE username = ?", [req.params.user], function (err) {
+								if (err) throw err;
+							})
+						}
+					})
+					infos.follow = "you report " + rows[0].firstname;
 				}
 				infos.birth = profile.age(rows[0].birthday);
 				connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
@@ -636,6 +704,74 @@ app.get("/logout.html", function (req, res) {
 		});
 		req.session.destroy();
 		res.redirect("/");
+	}
+});
+app.get("/message.html", function (req, res) {
+	var infos = [];
+	if (!req.session.username) {
+		res.redirect("/");
+	}
+	else {
+		connection.query("SELECT * FROM matchs WHERE matcher = ? OR matched = ?", [req.session.username, req.session.username], function (err, rows) {
+			if (err) throw err;
+			console.log(rows);
+			console.log("---------------------\n\n");
+			if (rows[0]) {
+				for (var k in rows) {
+					(function (k, infos, callback) {
+						if (rows[k].matcher !== req.session.username) {
+							connection.query("SELECT * FROM users WHERE username = ?", [rows[k].matcher], function (err, row) {
+								if (err) throw err;
+								if (row[0]) {
+									console.log("MATCHER");
+									console.log(k);
+									console.log(row);
+									console.log("---------------------\n\n")
+									infos[k] = row[k];
+									if (!rows[Number(k) + 1]) {
+										console.log("SLAUT LA COMPAGNIE");
+										console.log("MATCHER");
+										console.log(infos);
+										callback(infos);
+									}
+								}
+							})
+						}
+						else if (rows[k].matched !== req.session.username) {
+							console.log("COIOCI");
+							connection.query("SELECT * FROM users WHERE username =?", [rows[k].matched], function (err, row) {
+								if (err) throw err;
+								if (row[0]) {
+									console.log("MATCHED");
+									console.log(k);
+									console.log(row);
+									console.log("---------------------\n\n")
+									infos[k] = row[k];
+									if (!rows[Number(k) + 1]) {
+										console.log("SLAUT LA COMPAGNIE");
+										console.log("MATCHED");
+										console.log(infos);
+										callback(infos);
+									}
+								}
+							})
+						}
+					})(k, infos, function (infos) {
+						console.log(infos);
+						res.render("message.html", {
+							message: {
+								infos: infos
+							}
+						})
+					})
+				}
+			}
+			else {
+				res.render("message.html", {
+					message: "Nobody to chat with..."
+				})
+			}
+		})
 	}
 });
 app.get("/history.html", function (req, res) {
