@@ -77,7 +77,7 @@ connection.query("use matcha");
 app.engine('html', mustacheExpress());
 app.set('view engine', 'html');
 app.set('views', __dirname + '/public/html/');
-app.use(express.static('public'));
+app.use(express.static('public/'));
 app.use(bodyParser.urlencoded({
 	extended: true
 }));
@@ -479,7 +479,6 @@ app.get('/users.html/:user', function (req, res) {
 						connection.query("SELECT * FROM matchs WHERE (matcher = ? AND matched = ?) OR (matcher = ? AND matched = ?)", [req.session.username, req.params.user, req.params.user, req.session.username], function (err, match) {
 							connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
 								if (err) throw err;
-								console.log(infos);
 								if (data[0]) {
 									infos.follow = "you like " + rows[0].firstname;
 								}
@@ -502,6 +501,7 @@ app.get('/users.html/:user', function (req, res) {
 		}
 	}
 });
+var infos = {};
 app.post("/users.html/:user", function (req, res) {
 	if (!req.session.username) {
 		res.redirect('/');
@@ -513,36 +513,49 @@ app.post("/users.html/:user", function (req, res) {
 				res.redirect('/match.html');
 			}
 			else {
-				var infos = rows[0];
+				infos = rows[0];
 				var pov = req.body.pov;
 				if (pov === "follow") {
-					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, rows) {
+					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, row) {
 						if (err) throw err;
-						if (!rows[0]) {
+						if (!row[0]) {
 							connection.query("INSERT INTO liking(liker, liked) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
 								if (err) throw err;
 							});
 							connection.query("UPDATE users SET pop = pop + 5 WHERE username = ?", [req.params.user], function (err) {
 								if (err) throw err;
 							})
+							infos.follow = "you like " + rows[0].firstname;
 						}
-					})
-					infos.follow = "you like " + rows[0].firstname;
-					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.params.user, req.session.username], function (err, rows) {
-						if (err) throw err;
-						if (!rows[0]) {
-							connection.query("INSERT INTO matchs(matcher, matched) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
-								if (err) throw err;
-							});
-							connection.query("UPDATE users SET pop = pop + 10 WHERE username = ?", [req.params.user], function (err) {
-								if (err) throw err;
-							})
-							connection.query("UPDATE users SET pop = pop + 10 WHERE username = ?", [req.session.username], function (err) {
-								if (err) throw err;
-							})
+						else if (row[0]) {
+							infos.follow = "you already like " + rows[0].firstname;
 						}
+						connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.params.user, req.session.username], function (err, data) {
+							if (err) throw err;
+							connection.query("SELECT * FROM matchs WHERE (matcher = ? AND matched = ?) OR (matcher = ? AND matched = ?)", [req.session.username, req.params.user, req.params.user, req.session.username], function (err, match) {
+								if (err) throw err;
+								if (data[0]) {
+									if (!match[0]) {
+										connection.query("INSERT INTO matchs(matcher, matched) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
+											if (err) throw err;
+										});
+										connection.query("UPDATE users SET pop = pop + 10 WHERE username = ?", [req.params.user], function (err) {
+											if (err) throw err;
+										})
+										connection.query("UPDATE users SET pop = pop + 10 WHERE username = ?", [req.session.username], function (err) {
+											if (err) throw err;
+										})
+										console.log("WEEEEEEEEEEEEEEEEEEEEEEEEESH");
+										infos.follow2 = "you match with " + rows[0].firstname;
+										console.log(infos);
+									}
+									else if (match[0]) {
+										infos.follow2 = "you already match with " + rows[0].firstname;
+									}
+								}
+							})
+						})
 					})
-					infos.follow = "you match with " + rows[0].firstname;
 				}
 				else if (pov === "unfollow") {
 					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, rows) {
@@ -586,6 +599,7 @@ app.post("/users.html/:user", function (req, res) {
 				infos.birth = profile.age(rows[0].birthday);
 				connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
 					if (err) throw err;
+					console.log(infos);
 					res.render('users.html', {
 						users: {
 							infos: infos
@@ -708,68 +722,71 @@ app.get("/logout.html", function (req, res) {
 });
 app.get("/message.html", function (req, res) {
 	var infos = [];
+	var infos_tmp = [];
 	if (!req.session.username) {
 		res.redirect("/");
 	}
 	else {
-		connection.query("SELECT * FROM matchs WHERE matcher = ? OR matched = ?", [req.session.username, req.session.username], function (err, rows) {
+		connection.query("SELECT * FROM matchs WHERE matcher = ? OR matched = ? ", [req.session.username, req.session.username], function (err, rows) {
 			if (err) throw err;
-			console.log(rows);
-			console.log("---------------------\n\n");
-			if (rows[0]) {
-				for (var k in rows) {
-					(function (k, infos, callback) {
-						if (rows[k].matcher !== req.session.username) {
-							connection.query("SELECT * FROM users WHERE username = ?", [rows[k].matcher], function (err, row) {
-								if (err) throw err;
-								if (row[0]) {
-									console.log("MATCHER");
-									console.log(k);
-									console.log(row);
-									console.log("---------------------\n\n")
-									infos[k] = row[k];
-									if (!rows[Number(k) + 1]) {
-										console.log("SLAUT LA COMPAGNIE");
-										console.log("MATCHER");
-										console.log(infos);
-										callback(infos);
-									}
-								}
-							})
-						}
-						else if (rows[k].matched !== req.session.username) {
-							console.log("COIOCI");
-							connection.query("SELECT * FROM users WHERE username =?", [rows[k].matched], function (err, row) {
-								if (err) throw err;
-								if (row[0]) {
-									console.log("MATCHED");
-									console.log(k);
-									console.log(row);
-									console.log("---------------------\n\n")
-									infos[k] = row[k];
-									if (!rows[Number(k) + 1]) {
-										console.log("SLAUT LA COMPAGNIE");
-										console.log("MATCHED");
-										console.log(infos);
-										callback(infos);
-									}
-								}
-							})
-						}
-					})(k, infos, function (infos) {
-						console.log(infos);
-						res.render("message.html", {
-							message: {
-								infos: infos
-							}
-						})
-					})
-				}
+			for (var k in rows) {
+				(function (k) {
+					if (rows[k].matcher !== req.session.username) infos_tmp[k] = rows[k].matcher;
+					else if (rows[k].matched !== req.session.username) infos_tmp[k] = rows[k].matched;
+				})(k);
 			}
-			else {
-				res.render("message.html", {
-					message: "Nobody to chat with..."
-				})
+			for (var j in infos_tmp) {
+				(function (j, callback) {
+					connection.query("SELECT * FROM users WHERE username = ?", [infos_tmp[j]], function (err, data) {
+						infos[j] = data[0];
+						infos[j].class = (Number(j) % 2) + 1;
+						if (!infos_tmp[Number(j) + 1]) {
+							callback();
+						}
+					})
+				})(j, function () {
+					res.render("message.html", {
+						message: {
+							infos: infos
+						}
+					})
+				});
+			}
+		})
+	}
+});
+app.get("/message.html/:user", function (req, res) {
+	var infos = [];
+	var infos_tmp = [];
+	if (!req.session.username) {
+		res.redirect("/");
+	}
+	else {
+		connection.query("SELECT * FROM matchs WHERE matcher = ? OR matched = ? ", [req.session.username, req.session.username], function (err, rows) {
+			if (err) throw err;
+			for (var k in rows) {
+				(function (k) {
+					if (rows[k].matcher !== req.session.username) infos_tmp[k] = rows[k].matcher;
+					else if (rows[k].matched !== req.session.username) infos_tmp[k] = rows[k].matched;
+				})(k);
+			}
+			for (var j in infos_tmp) {
+				(function (j, callback) {
+					connection.query("SELECT * FROM users WHERE username = ?", [infos_tmp[j]], function (err, data) {
+						infos[j] = data[0];
+						infos[j].class = (Number(j) % 2) + 1;
+						if (!infos_tmp[Number(j) + 1]) {
+							callback();
+						}
+					})
+				})(j, function () {
+					res.render("message.html", {
+						chatwithme: req.params.user
+						, message: {
+							infos: infos
+						}
+					})
+				});
 			}
 		})
 	}

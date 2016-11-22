@@ -1,5 +1,5 @@
 (function ($) {
-    var socket = io.connect('http://localhost:1234');
+    var socket = io.connect('https://localhost:4433');
     var msgtpl = $('#msgtpl').html();
     var lastmsg = false;
     $('#msgtpl').remove();
