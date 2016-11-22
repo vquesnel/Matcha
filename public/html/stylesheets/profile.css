@@ -96,13 +96,30 @@
     display: inline-block;
     float: right;
     margin-right: 40px;
-    margin-top: 10px;
-    height: 40px;
     vertical-align: middle;
+    height: 50px;
+    font-size: 0;
+}
+
+.reg-name {
+    display: inline-block;
+    width: 50px;
+    margin-left: 5px;
+}
+
+.reglage a {
+    color: #acaaaa;
+    margin-right: 30px;
+    font-size: 15px;
+}
+
+.reglage a:hover {
+    color: #7fc4ff;
 }
 
 .reglage img {
     width: 30px;
+    vertical-align: middle;
 }
 
 
