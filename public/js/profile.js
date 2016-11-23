@@ -3,9 +3,9 @@ function Changeprofile_pic(_this) {
 	socket.emit("changeprofile_pic", {
 		picture: _this.src
 	});
+	
 	var usr_pic = document.getElementById("usr-pic");
 	var src = document.getElementById("usr-pic").src;
 	usr_pic.src = _this.src;
 	_this.src = src;
-	console.log(document.getElementById("usr-pic").src);
 }

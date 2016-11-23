@@ -1,11 +1,12 @@
 <html>
 
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>Matcha | Match</title>
-    <link href="/html/stylesheets/main.css" rel="stylesheet">
-    <link href="/html/stylesheets/match.css" rel="stylesheet">
+    <link href="/stylesheets/main.css" rel="stylesheet">
+    <link href="/stylesheets/match.css" rel="stylesheet">
     <script type="text/javascript" src="/js/front.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
     <script src="/js/mustache.js"></script>
@@ -13,7 +14,8 @@
 
 <body>
     <div class="menu">
-        <input id="search-bar" type="text" name="search" placeholder="Search ..."> <a href="match.html"> <img id="menu-logo" src="img/mini-logo.png" alt="mini-logo"></a>
+        <input id="search-bar" type="text" name="search" placeholder="Search ...">
+        <a href="match.html"> <img id="menu-logo" src="img/mini-logo.png" alt="mini-logo"></a>
         <a href="#"><img class="menu-img" src="/img/feed.png"></a>
         <a href="profile.html"><img class="menu-img" src="/img/account.png"></a>
         <a href="message.html"><img class="menu-img" src="/img/envelope.png"></a>
@@ -25,12 +27,10 @@
     <div class="separator"></div>
     <div class="site-content" align="center">
         <div id="match" class="hud" align="left">
-            {{>homepage}}
+            {{>homepage}} {{message}}
         </div>
     </div>
     <div class="separator"></div>
     <div class="separator"></div>
     <div class="separator"></div>
 </body>
-
-</html>
