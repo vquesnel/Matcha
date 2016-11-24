@@ -63,6 +63,7 @@ var upload = multer({
 var sharp = require('sharp');
 var cookie = require('cookie')
 var cookieParser = require('cookie-parser');
+const publicIp = require('public-ip');
 /*     S Q L    C  O  N  N  E  X  I  O  N  S    */
 connection.connect(function (err) {
 	if (err) throw err;
@@ -75,6 +76,7 @@ connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`liking` ( `liker` VARCHAR
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`reports` ( `reporter` VARCHAR(255) NOT NULL , `reported` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`tags` ( `tag` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`matchs` ( `matcher` VARCHAR(255) NOT NULL , `matched` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`block` ( `block_by` VARCHAR(255) NOT NULL , `blocked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("use matcha");
 /*     P  A  G  E  S      R  E  Q  U  E  S  T  S     -     E X P R E S S     */
 app.engine('html', mustacheExpress());
@@ -434,6 +436,49 @@ app.get('/match.html', function (req, res) {
 		})
 	}
 });
+app.get("/match_people.html", function (req, res) {
+	var infos = [];
+	var infos_tmp = [];
+	if (!req.session.username) {
+		res.redirect("/");
+	}
+	else {
+		connection.query("SELECT * FROM matchs WHERE matcher = ? OR matched = ? ", [req.session.username, req.session.username], function (err, rows) {
+			if (err) throw err;
+			if (rows[0]) {
+				for (var k in rows) {
+					(function (k) {
+						if (rows[k].matcher !== req.session.username) infos_tmp[k] = rows[k].matcher;
+						else if (rows[k].matched !== req.session.username) infos_tmp[k] = rows[k].matched;
+					})(k);
+				}
+				for (var j in infos_tmp) {
+					(function (j, callback) {
+						connection.query("SELECT * FROM users WHERE username = ?", [infos_tmp[j]], function (err, data) {
+							infos[j] = data[0];
+							infos[j].birth = profile.age(data[0].birthday);
+							infos[j].class = (Number(j) % 2) + 1;
+							if (!infos_tmp[Number(j) + 1]) {
+								callback();
+							}
+						})
+					})(j, function () {
+						res.render("match_people.html", {
+							homepage: {
+								infos: infos
+							}
+						})
+					});
+				}
+			}
+			else {
+				res.render("match_people.html", {
+					message: "You match with nobody"
+				});
+			}
+		})
+	}
+});
 app.get('/profile.html', function (req, res) {
 	if (!req.session.username) {
 		res.redirect("/");
@@ -625,9 +670,9 @@ app.post("/users.html/:user", function (req, res) {
 					})
 				}
 				else if (pov === "reported") {
-					connection.query("SELECT * FROM reports WHERE reporter = ? AND reported = ?", [req.session.username, req.params.user], function (err, rows) {
+					connection.query("SELECT * FROM reports WHERE reporter = ? AND reported = ?", [req.session.username, req.params.user], function (err, row) {
 						if (err) throw err;
-						if (!rows[0]) {
+						if (!row[0]) {
 							connection.query("INSERT INTO reports(reporter, reported) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
 								if (err) throw err;
 							});
@@ -639,16 +684,45 @@ app.post("/users.html/:user", function (req, res) {
 					infos.pop -= 5;
 					infos.follow = "you report " + rows[0].firstname;
 					infos.birth = profile.age(rows[0].birthday);
-					connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
+					connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, pic) {
 						if (err) throw err;
 						res.render('users.html', {
 							users: {
 								infos: infos
 							}
 							, display_pictures_users: {
-								infos: row
+								infos: pic
 							}
 						});
+					})
+				}
+				else if (pov === "block") {
+					connection.query("SELECT * FROM block WHERE block_by = ? AND blocked =?", [req.session.username, req.params.user], function (err, row) {
+						if (err) throw err;
+						if (!row[0]) {
+							connection.query("INSERT INTO block(block_by, blocked) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
+								if (err) throw err;
+							});
+							connection.query("DELETE FROM matchs WHERE (matcher = ? AND matched = ?) OR (matcher =? AND matched = ?)", [req.params.user, req.session.username, req.session.username, req.params.user], function (err) {
+								if (err) throw err;
+							})
+							connection.query("DELETE FROM liking WHERE (liker = ? AND liked = ?) OR (liker =? AND liked = ?)", [req.params.user, req.session.username, req.session.username, req.params.user], function (err) {
+								if (err) throw err;
+							})
+							infos.follow = "you block " + rows[0].firstname;
+							infos.birth = profile.age(rows[0].birthday);
+							connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, pic) {
+								if (err) throw err;
+								res.render('users.html', {
+									users: {
+										infos: infos
+									}
+									, display_pictures_users: {
+										infos: pic
+									}
+								});
+							})
+						}
 					})
 				}
 			}
@@ -755,7 +829,7 @@ app.get("/logout.html", function (req, res) {
 		res.redirect("/");
 	}
 	else {
-		connection.query("UPDATE users SET login = ? WHERE username =?", [new Date(), req.session.username], function (err) {
+		connection.query("UPDATE users SET login = ? WHERE username =?", [new Date().toISOString().slice(0, 10), req.session.username], function (err) {
 			if (err) throw err;
 		});
 		req.session.destroy();
@@ -877,6 +951,56 @@ app.get("/history.html", function (req, res) {
 		})
 	}
 });
+app.get("/blocks.html", function (req, res) {
+	var infos = [];
+	if (!req.session.username) {
+		res.redirect("/");
+	}
+	else {
+		connection.query("SELECT * FROM block WHERE block_by =?", [req.session.username], function (err, rows) {
+			if (err) throw err;
+			if (rows[0]) {
+				for (var k in rows) {
+					(function (k, callback) {
+						connection.query("SELECT * FROM users WHERE username = ?", [rows[k].blocked], function (err, row) {
+							if (err) throw err;
+							else {
+								infos[k] = row[0];
+								infos[k].class = (Number(k) % 2) + 1;
+								infos[k].birth = profile.age(row[0].birthday);
+								if (!rows[Number(k) + 1]) {
+									callback();
+								}
+							}
+						});
+					})(k, function () {
+						res.render("blocks.html", {
+							blocked_people: {
+								infos: infos
+							}
+						})
+					});
+				}
+			}
+			else {
+				res.render("blocks.html", {
+					message: "You have blocked nobody"
+				})
+			}
+		})
+	}
+});
+app.get("/unblock/:user", function (req, res) {
+	if (!req.session.username) {
+		res.redirect("/");
+	}
+	else {
+		connection.query("DELETE FROM block WHERE block_by = ? AND blocked = ?", [req.session.username, req.params.user], function (err) {
+			if (err) throw err;
+			res.redirect("/blocks.html");
+		})
+	}
+})
 app.get("/followers.html", function (req, res) {
 	var infos = [];
 	if (!req.session.username) {
@@ -977,6 +1101,9 @@ app.post('/edit_account.html', function (req, res) {
 		})
 	}
 });
+app.get('*', function (req, res) {
+	res.status(404).send('Sorry this page doesn\'t exists');
+});
 /*     S  E  R  V  E  R     */
 var httpsServer = https.createServer(options, app, function (req, res) {
 	res.writeHead(200);
@@ -987,7 +1114,6 @@ var io = require('socket.io')(httpsServer);
 io.sockets.on('connection', function (socket) {
 	var cookies = cookieParser.signedCookies(cookie.parse(socket.handshake.headers.cookie), sess.secret);
 	var sessionid = cookies['connect.sid'];
-	console.log(sessionid);
 	socket.on("changeprofile_pic", function (data) {
 		data.picture = data.picture.replace("https://localhost:4433/", "");
 		connection.query("UPDATE users SET profil_pic = ? WHERE sessionID = ?", [data.picture, sessionid], function (err) {
@@ -1011,10 +1137,70 @@ io.sockets.on('connection', function (socket) {
 	});
 	socket.on("location", function (data) {
 		if (data) {
-			var location = data.location.split(",");
-			connection.query("UPDATE users SET location = ? WHERE sessionID = ?", [location[1], sessionid], function (err) {
-				if (err) throw err;
-			});
+			var location = data.location;
+			console.log(location);
+			if (location[1]) {
+				var arrondissement = location[1].split(',');
+				connection.query("UPDATE users SET location = ? WHERE sessionID = ?", [arrondissement[1], sessionid], function (err) {
+					if (err) throw err;
+				});
+			}
+			else {
+				var arrondissement = location[0].split(',');
+				connection.query("UPDATE users SET location = ? WHERE sessionID = ?", [arrondissement[1], sessionid], function (err) {
+					if (err) throw err;
+				});
+			}
 		}
+	})
+	publicIp.v4().then(function (ip) {
+		var location = geoip.lookup(ip).ll
+		socket.emit("iplocation", {
+			location: location
+		})
+	}).catch(function (err) {
+		console.log(err);
+	})
+	var users = {};
+	var messages = [];
+	var history = 2;
+	var me = false;
+	for (var k in users) {
+		socket.emit('newusr', users[k]);
+	}
+	for (var k in messages) {
+		socket.emit('newmsg', messages[k]);
+	}
+	/*reception msg*/
+	socket.on('newmsg', function (message) {
+		console.log(message);
+		message.user = me;
+		date = new Date();
+		message.h = date.getHours();
+		message.m = date.getMinutes();
+		messages.push(message);
+		if (messages.length > history) {
+			messages.shift();
+		}
+		console.log(message);
+		io.sockets.emit('newmsg', message);
+	});
+	/*CONNECTION */
+	socket.on('login', function (user) {
+		console.log(user);
+		me = user;
+		me.id = user.mail.replace('@', '-').replace('.', '-');
+		me.avatar = 'https://gravatar.com/avatar/' + md5(user.mail) + '?s=50';
+		socket.emit('logged');
+		users[me.id] = me;
+		io.sockets.emit('newuser', me);
+	});
+	/*DISCONNECT*/
+	socket.on('disconnect', function () {
+		if (!me) {
+			return false;
+		}
+		delete users[me.id];
+		io.sockets.emit('disuser', me);
 	})
 });

@@ -1,62 +1,60 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Matcha | Profile</title>
-    <link href="/stylesheets/main.css" rel="stylesheet">
-    <link href="/stylesheets/profile.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-    <script src="https://localhost:4433/socket.io/socket.io.js"></script>
-    <script src="/js/mustache.js"></script>
-    <script src="/js/profile.js"></script>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>Matcha | Profile</title>
+	<link href="/stylesheets/main.css" rel="stylesheet">
+	<link href="/stylesheets/profile.css" rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
+	<script src="/js/mustache.js"></script>
+	<script src="/js/profile.js"></script>
 </head>
 
 <body>
-    <div class="menu">
-        <a href="match.html"><img id="menu-logo" src="img/mini-logo.png" alt="mini-logo"></a>
-        <a href="#"><img class="menu-img" src="img/feed.png"></a>
-        <a href="profile.html"><img class="menu-img" src="/img/account.png"></a>
-        <a href="message.html"><img class="menu-img" src="/img/envelope.png"></a>
-        <a href="logout.html"><img class="menu-img" src="/img/logout.png"></a>
-    </div>
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <div class="site-content" align="center"> {{#profile.infos}}
-        <div class="usr" id="usr"> <img id="usr-pic" src="{{profil_pic}}" alt="user photo">
-            <div id="usr-info" class="usr-info" align="left">
-                <div class="usr-name">{{firstname}} {{lastname}}
-                    <br>
-                    <div class="usr-age">{{birth}} ans {{location}}</div>
-                    <div class="online">{{login}}</div>
-                </div>
-                <div class="bio" align="center">Bio</div>
-                <div class="usr-bio-text">{{bio}}</div>
-                <div class="usr-score">{{pop}}<img src="img/love-1.png" alt="user-score"></div>
-            </div>
-        </div> {{/profile.infos}}
-        <div class="top-bar" align="left"> <a href="followers.html" class="input d1">Followers</a> <a href="history.html" class="input d1">History</a>
-            <div class="reglage">
-                <a href="edit_profil.html"><img src="img/cogwheel.png">
-                    <div class="reg-name">Custom
-                    </div>
-                </a>
-                <a href="edit_account.html"><img src="img/locked.png">
-                    <div class="reg-name">Privacy
-                    </div>
-                </a>
-            </div>
-        </div>
-        <div id="my_pictures" class="usr-set"> {{>display_pictures}} </div>
-        <div class="bottom-bar" align="left">
-            <div class="signaler"><a href="#">Signaler ce compte</a></div>
-        </div>
-        <div class="separator"></div>
-        <div class="separator"></div>
-        <div class="separator"></div>
-    </div>
+	<div class="menu">
+		<a href="match.html"><img id="menu-logo" src="img/mini-logo.png" alt="mini-logo"></a>
+		<a href="#"><img class="menu-img" src="img/feed.png"></a>
+		<a href="profile.html"><img class="menu-img" src="/img/account.png"></a>
+		<a href="message.html"><img class="menu-img" src="/img/envelope.png"></a>
+		<a href="logout.html"><img class="menu-img" src="/img/logout.png"></a>
+	</div>
+	<div class="separator"></div>
+	<div class="separator"></div>
+	<div class="separator"></div>
+	<div class="separator"></div>
+	<div class="site-content" align="center"> {{#profile.infos}}
+		<div class="usr" id="usr"> <img id="usr-pic" src="{{profil_pic}}" alt="user photo">
+			<div id="usr-info" class="usr-info" align="left">
+				<div class="usr-name">{{firstname}} {{lastname}}
+					<br>
+					<div class="usr-age">{{birth}} ans {{location}}</div>
+					<div class="online">{{login}}</div>
+				</div>
+				<div class="bio" align="center">Bio</div>
+				<div class="usr-bio-text">{{bio}}</div>
+				<div class="usr-score">{{pop}}<img src="img/love-1.png" alt="user-score"></div>
+			</div>
+		</div> {{/profile.infos}}
+		<div class="top-bar" align="left"> <a href="followers.html" class="input d1">Followers</a> <a href="history.html" class="input d1">History</a><a href="match_people.html" class="input d1">People you match</a> <a href="blocks.html" class="input d2">People you block</a>
+			<div class="reglage">
+				<a href="edit_profil.html"><img src="img/cogwheel.png">
+					<div class="reg-name">Custom </div>
+				</a>
+				<a href="edit_account.html"><img src="img/locked.png">
+					<div class="reg-name">Privacy </div>
+				</a>
+			</div>
+		</div>
+		<div id="my_pictures" class="usr-set"> {{>display_pictures}} </div>
+		<div class="bottom-bar" align="left">
+			<div class="signaler"><a href="#">Signaler ce compte</a></div>
+		</div>
+		<div class="separator"></div>
+		<div class="separator"></div>
+		<div class="separator"></div>
+	</div>
 </body>
 
 </html>

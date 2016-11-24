@@ -19,11 +19,20 @@ function errorHandler(error) {
 $(document).ready(function () {
 	var socket = io.connect('https://localhost:4433');
 	var currgeocoder;
-	//Set geo location lat and long
+	var iploc;
+	var currentloc = [];
+	socket.on("iplocation", function (data) {
+			iploc = (data.location);
+			initializeCurrent(iploc[0], iploc[1]);
+		})
+		//Set geo location lat and long
 	navigator.geolocation.getCurrentPosition(function (position, html5Error) {
 		geo_loc = processGeolocationResult(position);
 		currLatLong = geo_loc.split(",");
-		initializeCurrent(currLatLong[0], currLatLong[1]);
+		if (currLatLong) {
+			initializeCurrent(currLatLong[0], currLatLong[1]);
+		}
+		else {}
 	});
 	//Get geo location result
 	function processGeolocationResult(position) {
@@ -36,7 +45,6 @@ $(document).ready(function () {
 	//Check value is present or not & call google api function
 	function initializeCurrent(latcurr, longcurr) {
 		currgeocoder = new google.maps.Geocoder();
-		//console.log(latcurr + "-- ######## --" + longcurr);
 		if (latcurr != '' && longcurr != '') {
 			var myLatlng = new google.maps.LatLng(latcurr, longcurr);
 			return getCurrentAddress(myLatlng);
@@ -48,10 +56,9 @@ $(document).ready(function () {
 			'location': location
 		}, function (results, status) {
 			if (status == google.maps.GeocoderStatus.OK) {
-				//console.log(results[0].formatted_address);
-				//$("#address").html(results[0].formatted_address);
+				currentloc.push(results[0].formatted_address);
 				socket.emit("location", {
-					location: results[0].formatted_address
+					location: currentloc
 				});
 			}
 			else {
