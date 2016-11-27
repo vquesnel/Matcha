@@ -1,55 +1,56 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<title>Matcha | Users</title>
-	<link href="/stylesheets/main.css" rel="stylesheet">
-	<link href="/stylesheets/profile.css" rel="stylesheet"
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-	<script src="/js/mustache.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Matcha | Users</title>
+    <link href="/stylesheets/main.css" rel="stylesheet">
+    <link href="/stylesheets/profile.css" rel="stylesheet">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js">
+    </script>
+    <script src="/js/mustache.js"></script>
 </head>
 
 <body>
-	<div class="menu">
-		<a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
-		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
-		<a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
-		<a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
-		<a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>
-	</div>
-	<div class="separator"></div>
-	<div class="separator"></div>
-	<div class="separator"></div>
-	<div class="separator"></div>
-	<div class="site-content" align="center"> {{#users.infos}}
-		<div class="usr" id="usr"> <img id="usr-pic" src="/{{profil_pic}}" alt="user photo">
-			<div id="usr-info" class="usr-info" align="left">
-				<div class="usr-name">{{firstname}} {{lastname}}
-					<br>
-					<div class="usr-age">{{birth}} ans {{location}}</div>
-					<div class="online">{{login}}</div>
-				</div>
-				<div class="bio" align="center">Bio</div>
-				<div class="usr-bio-text">{{bio}}</div>
-				<div class="usr-score">{{pop}}<img src="/img/love-1.png" alt="user-score"></div>
-			</div>
-		</div>
-		<div class="top-bar" align="left">
-			<form class="form-bar" method="post">
-				<input class="input d1" type="submit" name="pov" value="follow">
-				<input class="input d2" type="submit" name="pov" value="unfollow">
-				<div class="relation">{{follow}}</div>
-		</div> {{/users.infos}}
-		<div id="my_pictures" class="usr-set"> {{>display_pictures_users}} </div>
-		<div class="bottom-bar" align="left">
-			<input class="input d2" type="submit" name="pov" value="block">
-			<input class="input d2" type="submit" name="pov" value="reported"> </form>
-		</div>
-		<div class="separator"></div>
-		<div class="separator"></div>
-		<div class="separator"></div>
-	</div>
+    <div class="menu">
+        <a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
+        <a href="#"><img class="menu-img" src="/img/feed.png"></a>
+        <a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
+        <a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
+        <a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>
+    </div>
+    <div class="separator"></div>
+    <div class="separator"></div>
+    <div class="separator"></div>
+    <div class="separator"></div>
+    <div class="site-content" align="center"> {{#users.infos}}
+        <div class="usr" id="usr"> <img id="usr-pic" src="/{{profil_pic}}" alt="user photo">
+            <div id="usr-info" class="usr-info" align="left">
+                <div class="usr-name">{{firstname}} {{lastname}}
+                    <br>
+                    <div class="usr-age">{{birth}} ans {{location}}</div>
+                    <div class="online">{{login}}</div>
+                </div>
+                <div class="bio" align="center">Bio</div>
+                <div class="usr-bio-text">{{bio}}</div>
+                <div class="usr-score">{{pop}}<img src="/img/love-1.png" alt="user-score"></div>
+            </div>
+        </div>
+        <div class="top-bar" align="left">
+            <form class="form-bar" method="post">
+                <input class="input d1" type="submit" name="pov" value="follow">
+                <input class="input d2" type="submit" name="pov" value="unfollow">
+                <div class="relation">{{follow}}</div>
+        </div> {{/users.infos}}
+        <div id="my_pictures" class="usr-set"> {{>display_pictures_users}} </div>
+        <div class="bottom-bar" align="left">
+            <input class="input d2" type="submit" name="pov" value="block">
+            <input class="input d2" type="submit" name="pov" value="reported"> </form>
+        </div>
+        <div class="separator"></div>
+        <div class="separator"></div>
+        <div class="separator"></div>
+    </div>
 </body>
 
 </html>

@@ -20,6 +20,8 @@ var connection = mysql.createConnection({
 var bodyParser = require('body-parser');
 var mustacheExpress = require('mustache-express');
 var create_account = require('./server/create_Account');
+
+var db = require("./server/notification");
 var profile = require('./server/profile');
 var index = require("./server/index");
 var moment = require('moment');
@@ -77,6 +79,7 @@ connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`reports` ( `reporter` VAR
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`tags` ( `tag` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`matchs` ( `matcher` VARCHAR(255) NOT NULL , `matched` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`block` ( `block_by` VARCHAR(255) NOT NULL , `blocked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`UserComment` ( `UserId` INT(5) NOT NULL , UserName VARCHAR(255) NOT NULL , `Comment` VARCHAR(255) NOT NULL) ENGINE = InnoDB;");
 connection.query("use matcha");
 /*     P  A  G  E  S      R  E  Q  U  E  S  T  S     -     E X P R E S S     */
 app.engine('html', mustacheExpress());
@@ -87,6 +90,9 @@ app.use(bodyParser.urlencoded({
     extended: true
 }));
 app.use(session(sess));
+app.get("/comment.html", function (req, res) {
+    res.render("comment.html", {})
+});
 app.get('/', function (req, res) {
     res.render("index.html", {})
 });
@@ -342,6 +348,18 @@ app.post('/update', function (req, res) {
                     })
                 })(k);
             }
+            infos.messageprofil = "Profil has been updated";
+        }
+        if (req.body.firstname) {
+            connection.query("UPDATE users SET firstname = ? WHERE username = ?", [req.body.firstname, req.session.username], function (err) {
+                if (err) throw err;
+            });
+            infos.messageprofil = "Profil has been updated";
+        }
+        if (req.body.lastname) {
+            connection.query("UPDATE users SET lastname = ? WHERE username = ?", [req.body.lastname, req.session.username], function (err) {
+                if (err) throw err;
+            });
             infos.messageprofil = "Profil has been updated";
         }
         if (req.body.bio) {
@@ -1090,7 +1108,7 @@ io.sockets.on('connection', function (socket) {
     socket.on("location", function (data) {
         if (data) {
             var location = data.location;
-            console.log(location);
+            //console.log(location);
             if (location[1]) {
                 var arrondissement = location[1].split(',');
                 connection.query("UPDATE users SET location = ? WHERE sessionID = ?", [arrondissement[1], sessionid], function (err) {
@@ -1154,4 +1172,20 @@ io.sockets.on('connection', function (socket) {
         delete users[me.id];
         io.sockets.emit('disuser', me);
     })
+
+
+    socket.on('comment added', function (data) {
+        // Add the comment in database
+        db.addComment(data.username, data.comment, connection, function (error, result) {
+            if (error) {
+                io.emit('error');
+            } else {
+                // On successful addition, emit event for client.
+                io.sockets.emit("notify everyone", {
+                    user: data.username,
+                    comment: data.comment
+                });
+            }
+        });
+    });
 });
