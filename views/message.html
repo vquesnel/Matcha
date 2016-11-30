@@ -3,17 +3,13 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<title>Matcha | Message</title>
+	<title>Matcha | Message</title>
 	<link href="/stylesheets/main.css" rel="stylesheet">
-	<link href="/stylesheets/message.css" rel="stylesheet">
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
-	<script src="/js/client.js"></script>
-	<script src="/js/mustache.js"></script>
-</head>
+	<link href="/stylesheets/message.css" rel="stylesheet"> </head>
 
 <body>
 	<div class="menu">
+		<input id="search-bar" type="text" name="search" placeholder="Search ...">
 		<a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
 		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
 		<a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
@@ -30,18 +26,17 @@
 				<div class="contact-info">{{firstname}} {{lastname}}</div>
 				<div class="contact-notification">2</div>
 			</div>{{/message.infos}} </div>
-		<div id="chatter" class="message" align="center">
-			<div class="onglet-2">{{#chatwithme}}Chat with {{chatwithme}}{{/chatwithme}}{{^chatwithme}}Select a discussion{{/chatwithme}}</div>
-			<div id="msgtpl" style="display:none;">
+		<div class="message" align="center">
+			<div class="onglet-2"> {{#chatwithme}}Chat with {{chatwithme}}{{/chatwithme}}{{^chatwithme}}Select a discussion{{/chatwithme}} </div>
+			<div id="msgtpl">
 				<p> <strong>{{user.username}}</strong> </p>
 				<p> {{message}} </p> <span>{{h}}:{{m}}</span> </div>
+			<div>
+				<form action="" id="form" class="message-area">
+					<textarea type="text" id="message" class="text"></textarea>
+					<input type="submit" id="send" value="Send" class="submit" /> </form>
+			</div>
 		</div>
-		<div>
-			<form action="" id="form">
-				<textarea type="text" id="message" class="text"></textarea>
-				<input type="submit" id="send" value="Envoyer mon message !" class="submit" /> </form>
-		</div>
-	</div>
 </body>
 
 </html>

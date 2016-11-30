@@ -1,9 +1,19 @@
 {{#homepage.infos}}
 <tr class="match e{{class}}">
-	<td> <img src="{{profil_pic}}" alt="user-pic"></td>
-	<td class="match-name">{{firstname}}</td>
-	<td class="match-age">{{birth}}</td>
-	<td class="match-location">{{location}}</td>
-	<td class="match-pop">{{pop}}</td>
+	<td>
+		<div> <img src="{{profil_pic}}" alt="user-pic"> </div>
+	</td>
+	<td>
+		<div class="match-name">{{firstname}}</div>
+	</td>
+	<td>
+		<div class="match-age">{{birth}}</div>
+	</td>
+	<td>
+		<div class="match-location">{{location}}</div>
+	</td>
+	<td>
+		<div class="match-pop">{{pop}}</div>
+	</td>
 	<td><a class="show-profil" href="/users.html/{{username}}">voir le profil</a> </td>
 </tr>{{/homepage.infos}}

@@ -77,7 +77,6 @@ $('#location, #popscore , #age, #firstname').wrapInner('<span title="sort this c
 			return $(this).index() === thIndex;
 		}).sortElements(function (a, b) {
 			if (Number($.text([a])) && Number($.text([b]))) {
-				console.log("weeesh");
 				return $.text([a]) - $.text([b]) > 0 ? inverse ? -1 : 1 : inverse ? 1 : -1;
 			}
 			else {
