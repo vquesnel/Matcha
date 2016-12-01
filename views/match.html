@@ -10,15 +10,16 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 	<script src="/js/mustache.js"></script>
 	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
-	<script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
+	<script src="/js/typeahead.min.js"></script>
 	<script src="/js/front.js"></script>
+	<script src="/js/search.js"></script>
 	<script src="/js/sortElements.js"></script>
 </head>
 
 <body>
 	<div class="menu">
 		<!--	<input id="search-bar" type="text" spellcheck="false" name="search" type="text" placeholder="Search ...">-->
-		<input class="typeahead tt-query " spellcheck="false" autocomplete="off" name="typeahead" type="text" />
+		<input class="typeahead tt-query" spellcheck="false" autocomplete="off" name="typeahead" type="text" />
 		<a href="match.html"> <img id="menu-logo" src="img/mini-logo.png" alt="mini-logo"></a>
 		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
 		<a id="account" href="profile.html"><img class="menu-img" src="/img/account.png"></a>

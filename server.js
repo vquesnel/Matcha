@@ -865,25 +865,28 @@ app.get("/message.html", function (req, res) {
 			if (rows[0]) {
 				for (var k in rows) {
 					(function (k) {
-						if (rows[k].matcher !== req.session.username) infos_tmp[k] = rows[k].matcher;
-						else if (rows[k].matched !== req.session.username) infos_tmp[k] = rows[k].matched;
+						if (rows[k].matcher !== req.session.username) infos_tmp[k] = {
+							name: rows[k].matcher
+							, id: rows[k].id
+						}
+						else if (rows[k].matched !== req.session.username) infos_tmp[k] = {
+							name: rows[k].matched
+							, id: rows[k].id
+						}
 					})(k);
 				}
 				for (var j in infos_tmp) {
 					(function (j, callback) {
-						connection.query("SELECT * FROM users WHERE username = ?", [infos_tmp[j]], function (err, data) {
+						connection.query("SELECT * FROM users WHERE username = ?", [infos_tmp[j].name], function (err, data) {
 							infos[j] = data[0];
+							infos[j].id = infos_tmp[j].id;
 							infos[j].class = (Number(j) % 2) + 1;
 							if (!infos_tmp[Number(j) + 1]) {
 								callback();
 							}
 						})
 					})(j, function () {
-						res.render("message.html", {
-							message: {
-								infos: infos
-							}
-						})
+						res.redirect("/message.html/" + infos[0].id);
 					});
 				}
 			}
@@ -893,9 +896,9 @@ app.get("/message.html", function (req, res) {
 		})
 	}
 });
-app.get("/message.html/:user", function (req, res) {
+app.get("/message.html/:id", function (req, res) {
 	var infos = [];
-	var infos_tmp = [];
+	var infos_tmp = {};
 	if (!req.session.username) {
 		res.redirect("/");
 	}
@@ -904,24 +907,50 @@ app.get("/message.html/:user", function (req, res) {
 			if (err) throw err;
 			for (var k in rows) {
 				(function (k) {
-					if (rows[k].matcher !== req.session.username) infos_tmp[k] = rows[k].matcher;
-					else if (rows[k].matched !== req.session.username) infos_tmp[k] = rows[k].matched;
+					if (rows[k].matcher !== req.session.username) infos_tmp[k] = {
+						name: rows[k].matcher
+						, id: rows[k].id
+					}
+					else if (rows[k].matched !== req.session.username) infos_tmp[k] = {
+						name: rows[k].matched
+						, id: rows[k].id
+					}
 				})(k);
 			}
 			for (var j in infos_tmp) {
 				(function (j, callback) {
-					connection.query("SELECT * FROM users WHERE username = ?", [infos_tmp[j]], function (err, data) {
+					connection.query("SELECT * FROM users WHERE username = ?", [infos_tmp[j].name], function (err, data) {
 						infos[j] = data[0];
+						infos[j].id = infos_tmp[j].id
 						infos[j].class = (Number(j) % 2) + 1;
 						if (!infos_tmp[Number(j) + 1]) {
 							callback();
 						}
 					})
 				})(j, function () {
-					res.render("message.html", {
-						chatwithme: req.params.user
-						, message: {
-							infos: infos
+					connection.query("SELECT * FROM matchs WHERE id = ?", [req.params.id], function (err, row) {
+						if (err) throw err;
+						if (row[0].matcher !== req.session.username) {
+							connection.query("SELECT * FROM users WHERE username = ?", [row[0].matcher], function (err, rows) {
+								if (err) throw err;
+								res.render("message.html", {
+									chatwithme: rows[0].firstname
+									, message: {
+										infos: infos
+									}
+								})
+							})
+						}
+						else if (row[0].matched !== req.session.username) {
+							connection.query("SELECT * FROM users WHERE username = ?", [row[0].matched], function (err, rows) {
+								if (err) throw err;
+								res.render("message.html", {
+									chatwithme: rows[0].firstname
+									, message: {
+										infos: infos
+									}
+								})
+							})
 						}
 					})
 				});
@@ -1127,8 +1156,8 @@ var httpsServer = https.createServer(options, app, function (req, res) {
 });
 httpsServer.listen(4433);
 /*     S  O  C  K  E  T     */
-var io = require('socket.io')(httpsServer);
-io.sockets.on('connection', function (socket) {
+var io = require('socket.io').listen(httpsServer.listen(4433));
+io.on('connection', function (socket) {
 	var cookies = cookieParser.signedCookies(cookie.parse(socket.handshake.headers.cookie), sess.secret);
 	var sessionid = cookies['connect.sid'];
 	socket.on("changeprofile_pic", function (data) {
@@ -1177,62 +1206,4 @@ io.sockets.on('connection', function (socket) {
 	}).catch(function (err) {
 		console.log(err);
 	})
-	var users = {};
-	var messages = [];
-	var history = 2;
-	var me = false;
-	for (var k in users) {
-		socket.emit('newusr', users[k]);
-	}
-	for (var k in messages) {
-		socket.emit('newmsg', messages[k]);
-	}
-	/*reception msg*/
-	socket.on('newmsg', function (message) {
-		console.log(message);
-		message.user = me;
-		date = new Date();
-		message.h = date.getHours();
-		message.m = date.getMinutes();
-		messages.push(message);
-		if (messages.length > history) {
-			messages.shift();
-		}
-		console.log(message);
-		io.sockets.emit('newmsg', message);
-	});
-	/*CONNECTION */
-	socket.on('login', function (user) {
-		console.log(user);
-		me = user;
-		me.id = user.mail.replace('@', '-').replace('.', '-');
-		me.avatar = 'https://gravatar.com/avatar/' + md5(user.mail) + '?s=50';
-		socket.emit('logged');
-		users[me.id] = me;
-		io.sockets.emit('newuser', me);
-	});
-	/*DISCONNECT*/
-	socket.on('disconnect', function () {
-		if (!me) {
-			return false;
-		}
-		delete users[me.id];
-		io.sockets.emit('disuser', me);
-	})
-	socket.on('comment added', function (data) {
-		// Add the comment in database
-		db.addComment(data.username, data.comment, connection, function (error, result) {
-			if (error) {
-				io.emit('error');
-			}
-			else {
-				// On successful addition, emit event for client.
-				socket.broadcast.emit("notify everyone", {
-					user: data.username
-					, comment: data.comment
-					, info: " Posted a comment"
-				});
-			}
-		});
-	});
 });
