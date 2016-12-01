@@ -103,6 +103,7 @@ app.get('/search', function (req, res) {
 		for (i = 0; i < rows.length; i++) {
 			data.push(rows[i].firstname);
 		}
+		console.log(JSON.stringify(data));
 		res.end(JSON.stringify(data));
 	});
 });
@@ -964,7 +965,8 @@ app.get("/history.html", function (req, res) {
 		res.redirect("/");
 	}
 	else {
-		connection.query("SELECT * FROM history WHERE visited =?", [req.session.username], function (err, rows) {
+		connection.query("SELECT * FROM history WHERE visited = ?", [req.session.username], function (err, rows) {
+			console.log(rows);
 			if (err) throw err;
 			if (rows[0]) {
 				for (var k in rows) {
@@ -973,6 +975,7 @@ app.get("/history.html", function (req, res) {
 							if (err) throw err;
 							else {
 								infos[k] = row[0];
+								console.log(infos);
 								infos[k].class = (Number(k) % 2) + 1;
 								infos[k].birth = profile.age(row[0].birthday);
 								if (!rows[Number(k) + 1]) {

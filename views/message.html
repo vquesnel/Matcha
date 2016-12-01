@@ -5,11 +5,15 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<title>Matcha | Message</title>
 	<link href="/stylesheets/main.css" rel="stylesheet">
-	<link href="/stylesheets/message.css" rel="stylesheet"> </head>
+	<link href="/stylesheets/message.css" rel="stylesheet">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<script src="/js/typeahead.min.js"></script>
+	<script src="/js/search.js"></script>
+</head>
 
 <body>
 	<div class="menu">
-		<input id="search-bar" type="text" name="search" placeholder="Search ...">
+		<input id="search-bar" spellcheck="false" autocomplete="off" name="typeahead" type="text" placeholder="Search ...">
 		<a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
 		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
 		<a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
@@ -22,72 +26,22 @@
 	<div class="site-content" align="center">
 		<div class="side-bar">
 			<div class="onglet">Inbox</div> {{#message.infos}}
-			<div class="contact a{{class}}" onClick="document.location.href='/message.html/{{id}}'"> <img src="/{{profil_pic}}">
+			<div class="contact a{{class}}" onClick="document.location.href='/message.html/{{firstname}}'"> <img src="/{{profil_pic}}">
 				<div class="contact-info">{{firstname}} {{lastname}}</div>
 				<div class="contact-notification">2</div>
 			</div>{{/message.infos}} </div>
 		<div class="message" align="center">
 			<div class="onglet-2"> {{#chatwithme}}Chat with {{chatwithme}}{{/chatwithme}}{{^chatwithme}}Select a discussion{{/chatwithme}} </div>
-			<section class="section">
-				<!-- These elements are displayed as white info cards in the middle of the screen -->
-		<!--		<div class="connected"> <img src="../img/unnamed.jpg" id="creatorImage" />
-					<div class="infoConnected">
-						<h2>Who are you?</h2>
-						<br/>
-						<form class="loginForm">
-							<input type="text" id="yourName" placeholder="Your nick name" />
-							<br/>
-							<input type="text" id="yourEmail" placeholder="Your email address" />
-							<br/>
-							<input type="submit" id="yourEnter" value="ENTER" /> </form>
-					</div>
-				</div>-->
-				<div class="personinside"> <img src="../img/unnamed.jpg" id="ownerImage" />
-					<div class="infoInside">
-						<h2>Chat with <span class="nickname-chat"></span></h2>
-						<br/>
-						<form class="loginForm">
-							<input type="text" id="hisName" placeholder="Your nick name" />
-							<br/>
-							<input type="text" id="hisEmail" placeholder="Your email address" />
-							<br/>
-							<input type="submit" id="hisEnter" value="CHAT" /> </form>
-					</div>
-				</div>
-				<div class="invite-textfield">
-					<h2>Oops, there are no other people in this chat!</h2>
-					<h5>Invite a friend by sending them this URL</h5>
-					<div class="link">
-						<a title="Invite a friend" href="" id="link"></a>
-					</div>
-				</div>
-				<div class="left"> <img src="../img/unnamed.jpg" id="leftImage" />
-					<div class="info">
-						<h2><span class="nickname-left"></span> has left this chat.</h2>
-						<h5>Invite somebody else by sending them this page.</h5> </div>
-				</div>
-				<div class="toomanypeople">
-					<h2>Oops, you can not join this chat!</h2>
-					<h5>There are already two people in it. Would you like to create a <a title="New Room" href="/create" id="room">new room</a>?</h5> </div>
-				<div class="nomessages"> <img src="../img/unnamed.jpg" id="noMessagesImage" />
-					<div class="info">
-						<h2>You are chatting with <span class="nickname-chat"></span>.</h2>
-						<h5>Send them a message from the form below!</h5> </div>
-				</div>
-				<div class="chatscreen">
-					<ul class="chats">
-						<!-- The chat messages will go here -->
-					</ul>
-				</div>
+			<div id="msgtpl">
+				<p> <strong>{{user.username}}</strong> </p>
+				<p> {{message}} </p> <span>{{h}}:{{m}}</span> </div>
+			<div>
+				<form action="" id="form" class="message-area">
+					<textarea type="text" id="message" class="text"></textarea>
+					<input type="submit" id="send" value="Send" class="submit" /> </form>
+			</div>
 		</div>
-		<form id="chatform">
-			<textarea id="message" placeholder="Write something.."></textarea>
-			<input type="submit" id="submit" value="SEND" /> </form>
 	</div>
-	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-	<script src="/js/moment.js"></script>
-	<script src="/js/client.js"></script>
 </body>
 
 </html>
