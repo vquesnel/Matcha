@@ -79,6 +79,7 @@ connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`tags` ( `tag` VARCHAR(255
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`matchs` ( `matcher` VARCHAR(255) NOT NULL , `matched` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`block` ( `block_by` VARCHAR(255) NOT NULL , `blocked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`UserComment` ( `UserId` INT(5) NOT NULL , UserName VARCHAR(255) NOT NULL , `Comment` VARCHAR(255) NOT NULL) ENGINE = InnoDB;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`notification` ( `sender` VARCHAR(255) NOT NULL , `sended` VARCHAR(255) NOT NULL, `content` VARCHAR(255) NOT NULL) ENGINE = InnoDB;");
 connection.query("use matcha");
 connection.query("SET CHARACTER SET utf8mb4");
 /*     P  A  G  E  S      R  E  Q  U  E  S  T  S     -     E X P R E S S     */
@@ -97,15 +98,87 @@ app.get('/', function (req, res) {
 	res.render("index.html", {})
 });
 app.get('/search', function (req, res) {
-	connection.query('SELECT firstname from users where firstname like "%' + req.query.key + '%"', function (err, rows, fields) {
+	connection.query('SELECT firstname,lastname from users where firstname like "%' + req.query.key + '%" OR lastname like "%' + req.query.key + '%"', function (err, rows, fields) {
 		if (err) throw err;
 		var data = [];
 		for (i = 0; i < rows.length; i++) {
-			data.push(rows[i].firstname);
+			data.push(rows[i].firstname + " " + rows[i].lastname);
 		}
-		console.log(JSON.stringify(data));
 		res.end(JSON.stringify(data));
 	});
+});
+app.post('/search', function (req, res) {
+	var firstword = req.body.search[0].split(" ")[0];
+	var lastword = req.body.search[0].split(" ")[1];
+	if (firstword && lastword) {
+		connection.query("SELECT username FROM users WHERE (firstname = ? AND lastname = ?) OR (firstname = ? AND lastname = ?)", [firstword, lastword, lastword, firstword], function (err, rows) {
+			if (err) throw err;
+			if (rows[0] && !rows[1]) {
+				if (rows[0].username === req.session.username) {
+					res.redirect('/profile.html');
+				}
+				else {
+					res.redirect('/users.html/' + rows[0].username)
+				}
+			}
+			else {
+				connection.query('SELECT * from users where (firstname like "%' + firstword + '%" AND lastname like "%' + lastword + '%") OR (firstname like "%' + lastword + '%" AND lastname like "%' + firstword + '%")', function (err, rows) {
+					if (err) throw err;
+					if (rows[0]) {
+						for (var k in rows) {
+							rows[k].birth = profile.age(rows[k].birthday);
+						}
+						res.render("match.html", {
+							homepage: {
+								infos: rows
+							}
+						})
+					}
+					else {
+						res.render("match.html", {
+							message: "Nobobdy match this name"
+						})
+					}
+				})
+			}
+		})
+	}
+	else if (firstword && !lastword) {
+		connection.query("SELECT username FROM users WHERE (firstname = ?  OR  lastname = ?)", [firstword, firstword], function (err, rows) {
+			if (err) throw err;
+			if (rows[0] && !rows[1]) {
+				if (rows[0].username === req.session.username) {
+					res.redirect('/profile.html');
+				}
+				else {
+					res.redirect('/users.html/' + rows[0].username)
+				}
+			}
+			else {
+				connection.query('SELECT * from users where firstname like "%' + firstword + '%"  OR  lastname like "%' + firstword + '%"', function (err, rows) {
+					if (err) throw err;
+					if (rows[0]) {
+						for (var k in rows) {
+							rows[k].birth = profile.age(rows[k].birthday);
+						}
+						res.render("match.html", {
+							homepage: {
+								infos: rows
+							}
+						})
+					}
+					else {
+						res.render("match.html", {
+							message: "Nobobdy match this name"
+						})
+					}
+				})
+			}
+		})
+	}
+	else {
+		res.redirect(req.get('referer'));
+	}
 });
 app.post('/', function (req, res) {
 	var ret = index.index_checker(req.body.username, req.body.password);
@@ -129,6 +202,8 @@ app.post('/', function (req, res) {
 						if (err) throw err;
 					})
 					req.session.username = rows[0].username;
+					req.session.firstname = rows[0].firstname;
+					req.session.lastname = rows[0].lastname;
 					req.session.sexual_or = rows[0].sexual_or;
 					req.session.sexe = rows[0].sexe;
 					req.session.profil_pic = rows[0].profil_pic;
@@ -338,11 +413,24 @@ app.post('/upload', function (req, res) {
 });
 app.post('/update', function (req, res) {
 	var infos = {};
+	var hashtag = [];
+	var results = [];
 	infos.messageprofil = "Nothing to update";
 	(function (callback) {
 		if (req.body.preferences) {
-			var res = req.body.preferences.split(" ");
-			var results = create_account.find_duplicates(res);
+			var res = req.body.preferences.trim().split(" ");
+			for (var k in res) {
+				hashtag[k] = res[k].split("#");
+				hashtag[k] = create_account.cleanArray(hashtag[k]);
+			}
+			var j = 0;
+			for (var k in hashtag) {
+				for (var i in hashtag[k]) {
+					results[j] = hashtag[k][i];
+					j++
+				}
+			}
+			results = create_account.find_duplicates(results);
 			for (var k in results) {
 				(function (k) {
 					connection.query("SELECT * FROM tags WHERE tag = ? AND username = ?", [results[k], req.session.username], function (err, rows) {
@@ -434,7 +522,6 @@ app.get('/match.html', function (req, res) {
 					if (err) throw err;
 					else {
 						for (var k in rows) {
-							rows[k].class = (Number(k) % 2) + 1;
 							rows[k].birth = profile.age(rows[k].birthday);
 						}
 						res.render("match.html", {
@@ -506,14 +593,20 @@ app.get('/profile.html', function (req, res) {
 				infos.birth = profile.age(rows[0].birthday);
 				connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.session.username, rows[0].profil_pic], function (err, row) {
 					if (err) throw err;
-					res.render("profile.html", {
-						profile: {
-							infos: infos
-						}
-						, display_pictures: {
-							infos: row
-						}
-					});
+					connection.query("SELECT tag FROM tags WHERE username = ?", [req.session.username], function (err, tags) {
+						if (err) throw err;
+						res.render("profile.html", {
+							profile: {
+								infos: infos
+							}
+							, display_pictures: {
+								infos: row
+							}
+							, display_tags: {
+								infos: tags
+							}
+						});
+					})
 				})
 			}
 		})
@@ -528,6 +621,10 @@ app.get('/users.html/:user', function (req, res) {
 			res.redirect('/profile.html');
 		}
 		else {
+			var content = req.session.firstname + " " + req.session.lastname + " has visited your profil";
+			connection.query("INSERT INTO notification(sender,sended,content) VALUES(?,?,?)", [req.session.username, req.params.user, content], function (err) {
+				if (err) throw err;
+			})
 			connection.query("SELECT * FROM history WHERE visitor = ? AND visited = ?", [req.session.username, req.params.user], function (err, rows) {
 				if (err) throw err;
 				if (!rows[0]) {
@@ -554,23 +651,29 @@ app.get('/users.html/:user', function (req, res) {
 							connection.query("SELECT * FROM matchs WHERE (matcher = ? AND matched = ?) OR (matcher = ? AND matched = ?)", [req.session.username, req.params.user, req.params.user, req.session.username], function (err, match) {
 								connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, row) {
 									if (err) throw err;
-									if (data[0]) {
-										infos.follow = "you like " + rows[0].firstname;
-									}
-									if (liker[0]) {
-										infos.follow = rows[0].firstname + " likes your profil";
-									}
-									if (match[0]) {
-										infos.follow = "you match with " + rows[0].firstname;
-									}
-									res.render('users.html', {
-										users: {
-											infos: infos
+									connection.query("SELECT tag FROM tags WHERE username =?", [req.params.user], function (err, tags) {
+										if (err) throw err;
+										if (data[0]) {
+											infos.follow = "you like " + rows[0].firstname;
 										}
-										, display_pictures_users: {
-											infos: row
+										if (liker[0]) {
+											infos.follow = rows[0].firstname + " likes your profil";
 										}
-									});
+										if (match[0]) {
+											infos.follow = "you match with " + rows[0].firstname;
+										}
+										res.render('users.html', {
+											users: {
+												infos: infos
+											}
+											, display_pictures_users: {
+												infos: row
+											}
+											, display_tags: {
+												infos: tags
+											}
+										});
+									})
 								});
 							});
 						});
@@ -598,6 +701,10 @@ app.post("/users.html/:user", function (req, res) {
 					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, row) {
 						if (err) throw err;
 						if (!row[0]) {
+							var content = req.session.firstname + " " + req.session.lastname + " liked your profil";
+							connection.query("INSERT INTO notification(sender,sended,content) VALUES(?,?,?)", [req.session.username, req.params.user, content], function (err) {
+								if (err) throw err;
+							})
 							connection.query("INSERT INTO liking(liker, liked) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
 								if (err) throw err;
 							});
@@ -616,6 +723,10 @@ app.post("/users.html/:user", function (req, res) {
 								if (err) throw err;
 								if (data[0]) {
 									if (!match[0]) {
+										var content = req.session.firstname + " " + req.session.lastname + " matched with you";
+										connection.query("INSERT INTO notification(sender,sended,content) VALUES(?,?,?)", [req.session.username, req.params.user, content], function (err) {
+											if (err) throw err;
+										})
 										connection.query("INSERT INTO matchs(matcher, matched) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
 											if (err) throw err;
 										});
@@ -649,6 +760,10 @@ app.post("/users.html/:user", function (req, res) {
 					})
 				}
 				else if (pov === "unfollow") {
+					var content = req.session.firstname + " " + req.session.lastname + " don't like your profil anymore";
+					connection.query("INSERT INTO notification(sender,sended,content) VALUES(?,?,?)", [req.session.username, req.params.user, content], function (err) {
+						if (err) throw err;
+					})
 					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, rows) {
 						if (err) throw err;
 						if (rows[0]) {
@@ -966,7 +1081,6 @@ app.get("/history.html", function (req, res) {
 	}
 	else {
 		connection.query("SELECT * FROM history WHERE visited = ?", [req.session.username], function (err, rows) {
-			console.log(rows);
 			if (err) throw err;
 			if (rows[0]) {
 				for (var k in rows) {
@@ -975,7 +1089,7 @@ app.get("/history.html", function (req, res) {
 							if (err) throw err;
 							else {
 								infos[k] = row[0];
-								console.log(infos);
+								c
 								infos[k].class = (Number(k) % 2) + 1;
 								infos[k].birth = profile.age(row[0].birthday);
 								if (!rows[Number(k) + 1]) {
@@ -1150,8 +1264,46 @@ app.post('/edit_account.html', function (req, res) {
 		})
 	}
 });
+app.get('/tags.html/:tag', function (req, res) {
+	var infos = [];
+	if (!req.session.username) {
+		res.redirect('/');
+	}
+	else {
+		connection.query("SELECT username FROM tags WHERE tag = ?", [req.params.tag], function (err, rows) {
+			if (err) throw err;
+			if (rows[0]) {
+				for (var k in rows) {
+					(function (k, callback) {
+						connection.query("SELECT * FROM users WHERE username = ?", [rows[k].username], function (err, row) {
+							if (err) throw err;
+							else {
+								infos[k] = row[0];
+								infos[k].birth = profile.age(row[0].birthday);
+								if (!rows[Number(k) + 1]) {
+									callback();
+								}
+							}
+						});
+					})(k, function () {
+						res.render("tags.html", {
+							homepage: {
+								infos: infos
+							}
+						})
+					});
+				}
+			}
+		})
+	}
+})
 app.get('*', function (req, res) {
-	res.status(404).send('Sorry this page doesn\'t exists');
+	if (!req.session.username) {
+		res.redirect('/');
+	}
+	else {
+		res.status(404).send('Sorry this page doesn\'t exists');
+	}
 });
 /*     S  E  R  V  E  R     */
 var httpsServer = https.createServer(options, app, function (req, res) {

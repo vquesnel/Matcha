@@ -13,7 +13,9 @@
 
 <body>
 	<div class="menu">
-		<input id="search-bar" spellcheck="false" autocomplete="off" name="typeahead" type="text" placeholder="Search ...">
+		<form method="post" action="/search" class="search-form">
+			<input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
+			<input id="go" type="submit" name="search" value="Go!"> </form>
 		<a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
 		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
 		<a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
@@ -26,7 +28,7 @@
 	<div class="site-content" align="center">
 		<div class="side-bar">
 			<div class="onglet">Inbox</div> {{#message.infos}}
-			<div class="contact a{{class}}" onClick="document.location.href='/message.html/{{firstname}}'"> <img src="/{{profil_pic}}">
+			<div class="contact a{{class}}" onClick="document.location.href='/message.html/{{id}}'"> <img src="/{{profil_pic}}">
 				<div class="contact-info">{{firstname}} {{lastname}}</div>
 				<div class="contact-notification">2</div>
 			</div>{{/message.infos}} </div>
