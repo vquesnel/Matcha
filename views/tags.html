@@ -3,11 +3,9 @@
 <head>
 	<meta charset="utf-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<title>Matcha | Tags</title>
+	<title>Matcha | Match</title>
 	<link href="/stylesheets/main.css" rel="stylesheet">
 	<link href="/stylesheets/match.css" rel="stylesheet">
-	<link rel="stylesheet" href="/stylesheets/ion.rangeSlider.css" />
-	<link rel="stylesheet" href="/stylesheets/ion.rangeSlider.skinFlat.css" />
 	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBylV2tWJmuiBNLN3XK2a-LBtkv3doz6H8"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 	<script src="/js/mustache.js"></script>
@@ -39,8 +37,20 @@
 	<div class="separator"></div>
 	<div class="separator"></div>
 	<div class="site-content" align="center">
-		<div>
-			<input type="text" id="range" value="" name="range" /> </div>
+		<form method="get">
+			<div>SELECT AN AGE RANGE
+				<input type="text" name="agemin" placeholder="age min">
+				<input type="text" name="agemax" placeholder="age max"> </div>
+			<div>SLECT A POPULARITY RANGE
+				<input type="text" name="popmin" placeholder="popularity min">
+				<input type="text" name="popmax" placeholder="popularity max"> </div>
+			<div>SELECT A LOCATION RANGE
+				<input type="text" name="locmin" placeholder="location min">
+				<input type="text" name="locmax" placeholder="location max"> </div>
+			<div>SELECT A COMMUN TAGS RANGE
+				<input type="text" name="tagmin" placeholder="commun tag min">
+				<input type="text" name="tagmax" placeholder="commun tag max"> </div>
+			<input id="filter" type="submit" name="submit" value="filter"> </form>
 		<table id="match" class="hud" align="center">
 			<tr class="table-title">
 				<th>Profil picture</th>
@@ -55,22 +65,6 @@
 	<div class="separator"></div>
 	<div class="separator"></div>
 	<script src="/js/match.js"></script>
-	<script src="/js/ion.rangeSlider.js"></script>
-	<script>
-		$(function () {
-			$("#range").ionRangeSlider({
-				hide_min_max: true
-				, keyboard: true
-				, min: 0
-				, max: 500
-				, from: 0
-				, to: 500
-				, type: 'double'
-				, step: 1
-				, grid: true
-			});
-		});
-	</script>
 </body>
 
 </html>

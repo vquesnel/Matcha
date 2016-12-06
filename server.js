@@ -69,17 +69,17 @@ const publicIp = require('public-ip');
 connection.connect(function (err) {
 	if (err) throw err;
 });
-connection.query("CREATE DATABASE IF NOT EXISTS matcha;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`users` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(255) NOT NULL , `lastname` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `birthday` DATE NOT NULL , `email` VARCHAR(255) NOT NULL , `password` VARCHAR(255) NOT NULL , `sexe` VARCHAR(8) NOT NULL , `token` VARCHAR(255) NOT NULL , `validation` VARCHAR(1) NOT NULL DEFAULT '0' ,  `profil_pic` LONGTEXT DEFAULT NULL, `sexual_or` VARCHAR(10) NOT NULL DEFAULT 'bi' , `bio` VARCHAR(255) DEFAULT NULL , `location` VARCHAR(255) DEFAULT NULL ,  `pop` INT(5) DEFAULT '0', login VARCHAR(255), `sessionID` VARCHAR(255) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`pictures` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `pic` LONGTEXT NOT NULL , `username` VARCHAR(255) NOT NULL,  PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`history` ( `visitor` VARCHAR(255) NOT NULL , `visited` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`liking` ( `liker` VARCHAR(255) NOT NULL , `liked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`reports` ( `reporter` VARCHAR(255) NOT NULL , `reported` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`tags` ( `tag` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`matchs` ( `matcher` VARCHAR(255) NOT NULL , `matched` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`block` ( `block_by` VARCHAR(255) NOT NULL , `blocked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`UserComment` ( `UserId` INT(5) NOT NULL , UserName VARCHAR(255) NOT NULL , `Comment` VARCHAR(255) NOT NULL) ENGINE = InnoDB;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`notification` ( `sender` VARCHAR(255) NOT NULL , `sended` VARCHAR(255) NOT NULL, `content` VARCHAR(255) NOT NULL) ENGINE = InnoDB;");
+connection.query("CREATE DATABASE IF NOT EXISTS matcha CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`users` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(255) NOT NULL , `lastname` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `birthday` DATE NOT NULL , `email` VARCHAR(255) NOT NULL , `password` VARCHAR(255) NOT NULL , `sexe` VARCHAR(8) NOT NULL , `token` VARCHAR(255) NOT NULL , `validation` VARCHAR(1) NOT NULL DEFAULT '0' ,  `profil_pic` LONGTEXT DEFAULT NULL, `sexual_or` VARCHAR(10) NOT NULL DEFAULT 'bi' , `bio` VARCHAR(255) DEFAULT NULL , `location` VARCHAR(255) DEFAULT NULL ,  `pop` INT(5) DEFAULT '0', login VARCHAR(255), `sessionID` VARCHAR(255) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4  COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`pictures` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `pic` LONGTEXT NOT NULL , `username` VARCHAR(255) NOT NULL,  PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`history` ( `visitor` VARCHAR(255) NOT NULL , `visited` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`liking` ( `liker` VARCHAR(255) NOT NULL , `liked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`reports` ( `reporter` VARCHAR(255) NOT NULL , `reported` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`tags` ( `tag` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`matchs` ( `matcher` VARCHAR(255) NOT NULL , `matched` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`block` ( `block_by` VARCHAR(255) NOT NULL , `blocked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`UserComment` ( `UserId` INT(5) NOT NULL , UserName VARCHAR(255) NOT NULL , `Comment` VARCHAR(255) NOT NULL) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`notification` (`id` INT(5) NOT NULL AUTO_INCREMENT, `sender` VARCHAR(255) NOT NULL , `sended` VARCHAR(255) NOT NULL, `content` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection.query("use matcha");
 connection.query("SET CHARACTER SET utf8mb4");
 /*     P  A  G  E  S      R  E  Q  U  E  S  T  S     -     E X P R E S S     */
@@ -226,7 +226,7 @@ app.post('/', function (req, res) {
 				})
 			}
 		})
-		connection.query("SELECT * FROM users WHERE username = ? ANd password = ?", [req.body.username, md5(req.body.password)], function (err, rows) {
+		connection.query("SELECT * FROM users WHERE username = ? AND password = ?", [req.body.username, md5(req.body.password)], function (err, rows) {
 			if (err) throw err;
 			if (rows.lenght) {
 				req.session.username = rows[0].username;
@@ -364,7 +364,10 @@ app.post('/upload', function (req, res) {
 					}
 					else {
 						sharp(req.file.path).resize(500, 500).toFile('public/' + cropped, function (err) {
-							if (err) throw err;
+							if (err) {
+								infos.messagephoto = "Unsupported image format";
+								callback(infos, rows);
+							}
 							else {
 								fs.unlinkSync(req.file.path);
 								if (!req.session.profil_pic) {
@@ -512,26 +515,91 @@ app.get('/match.html', function (req, res) {
 		res.redirect("/");
 	}
 	else {
+		var people = [];
+		var age_min = 18;
+		var age_max = 120;
+		var pop_min = 0;
+		var pop_max = 2000;
+		var loc_min = 0;
+		var loc_max = 150;
+		var tag_min = 0;
+		var tag_max = 50;
+		var tag_me = [];
+		var tag_tofind = [];
 		connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
 			if (err) throw err;
 			if (!rows[0].profil_pic) {
 				res.redirect("/edit_profil.html");
 			}
-			else {
-				connection.query("SELECT * FROM users", function (err, rows) {
+			connection.query("SELECT tag FROM tags WHERE username= ?", [req.session.username], function (err, tags) {
+				for (var p in tags) {
+					tag_me[p] = tags[p].tag;
+				}
+				if (req.query.agemin) {
+					age_min = req.query.agemin;
+				}
+				if (req.query.agemax) {
+					age_max = req.query.agemax;
+				}
+				if (req.query.popmin) {
+					pop_min = req.query.popmin;
+				}
+				if (req.query.popmax) {
+					pop_max = req.query.popmax;
+				}
+				if (req.query.locmin) {
+					loc_min = req.query.locmin;
+				}
+				if (req.query.locmax) {
+					loc_max = req.query.locmax;
+				}
+				if (req.query.tagmin) {
+					tag_min = req.query.tagmin;
+				}
+				if (req.query.tagmax) {
+					tag_max = req.query.tagmax;
+				}
+				connection.query("SELECT * FROM users WHERE (pop BETWEEN ? AND ?) AND username != ?", [pop_min, pop_max, req.session.username], function (err, rows) {
 					if (err) throw err;
 					else {
-						for (var k in rows) {
-							rows[k].birth = profile.age(rows[k].birthday);
-						}
-						res.render("match.html", {
-							homepage: {
-								infos: rows
+						(function (callback) {
+							for (var k in rows) {
+								var z = 0;
+								rows[k].birth = profile.age(rows[k].birthday);
+								rows[k].communtag = 0;
+								(function (k) {
+									connection.query("SELECT tag FROM tags WHERE username = ?", [rows[k].username], function (err, tagstofind) {
+										//console.log(rows[k].username);
+										for (var a in tagstofind) {
+											tag_tofind[a] = tagstofind[a].tag;
+										}
+										for (var j in tag_tofind) {
+											if (tag_me.includes(tag_tofind[j]) === true) {
+												rows[k].communtag = rows[k].communtag + 1;
+											}
+										}
+										if (Number(rows[k].birth) >= Number(age_min) && Number(rows[k].birth) <= Number(age_max)) {
+											if (Number(rows[k].communtag) >= Number(tag_min) && Number(rows[k].communtag) <= Number(tag_max)) {
+												people[z] = rows[k];
+												z++;
+											}
+										}
+										if (!rows[Number(k) + 1]) {
+											callback(people);
+										}
+									})
+								})(k);
 							}
+						})(function (people) {
+							res.render("match.html", {
+								homepage: {
+									infos: people
+								}
+							})
 						})
 					}
 				})
-			}
+			})
 		})
 	}
 });
@@ -613,6 +681,7 @@ app.get('/profile.html', function (req, res) {
 	}
 });
 app.get('/users.html/:user', function (req, res) {
+	var infos = [];
 	if (!req.session.username) {
 		res.redirect('/');
 	}
@@ -630,6 +699,7 @@ app.get('/users.html/:user', function (req, res) {
 				if (!rows[0]) {
 					connection.query("UPDATE users SET pop = pop + 2 WHERE username = ?", [req.params.user], function (err) {
 						if (err) throw err;
+						infos.pop = infos.pop + 2;
 					});
 					connection.query("INSERT INTO history(visitor, visited) VALUES (?,?)", [req.session.username, req.params.user], function (err) {
 						if (err) throw err;
@@ -642,7 +712,7 @@ app.get('/users.html/:user', function (req, res) {
 					res.redirect('/match.html');
 				}
 				else {
-					var infos = rows[0];
+					infos = rows[0];
 					infos.birth = profile.age(rows[0].birthday);
 					connection.query("SELECT * FROM liking WHERE liker = ? AND liked = ?", [req.session.username, req.params.user], function (err, data) {
 						if (err) throw err;
@@ -770,10 +840,18 @@ app.post("/users.html/:user", function (req, res) {
 							connection.query("DELETE FROM liking WHERE liker=? AND liked = ?", [req.session.username, req.params.user], function (err) {
 								if (err) throw err;
 							});
-							connection.query("UPDATE users SET pop =pop - 5 WHERE username = ?", [req.params.user], function (err) {
-								if (err) throw err;
-							})
-							infos.pop -= 5;
+							if (infos.pop >= 5) {
+								connection.query("UPDATE users SET pop =pop - 5 WHERE username = ?", [req.params.user], function (err) {
+									if (err) throw err;
+								})
+								infos.pop -= 5;
+							}
+							else {
+								connection.query("UPDATE users SET pop = 0 WHERE username = ?", [req.params.user], function (err) {
+									if (err) throw err;
+								})
+								infos.pop = 0;
+							}
 						}
 					})
 					connection.query("SELECT * FROM matchs WHERE (matcher = ? AND matched = ?) OR (matcher = ? AND matched = ?)", [req.session.username, req.params.user, req.params.user, req.session.username], function (err, rows) {
@@ -782,10 +860,18 @@ app.post("/users.html/:user", function (req, res) {
 							connection.query("DELETE FROM matchs WHERE  (matcher = ? AND matched = ?) OR (matcher = ? AND matched = ?)", [req.session.username, req.params.user, req.params.user, req.session.username], function (err) {
 								if (err) throw err;
 							});
-							connection.query("UPDATE users SET pop =pop - 10 WHERE username = ?", [req.params.user], function (err) {
-								if (err) throw err;
-							})
-							infos.pop -= 10;
+							if (infos.pop >= 10) {
+								connection.query("UPDATE users SET pop =pop - 10 WHERE username = ?", [req.params.user], function (err) {
+									if (err) throw err;
+								})
+								infos.pop -= 10;
+							}
+							else {
+								connection.query("UPDATE users SET pop = 0 WHERE username = ?", [req.params.user], function (err) {
+									if (err) throw err;
+								})
+								infos.pop = 0;
+							}
 						}
 					})
 					infos.follow = "you do not like " + rows[0].firstname + " anymore";
@@ -809,12 +895,24 @@ app.post("/users.html/:user", function (req, res) {
 							connection.query("INSERT INTO reports(reporter, reported) VALUES(?,?)", [req.session.username, req.params.user], function (err) {
 								if (err) throw err;
 							});
-							connection.query("UPDATE users SET pop = pop - 5 WHERE username = ?", [req.params.user], function (err) {
-								if (err) throw err;
-							})
+							if (infos.pop >= 5) {
+								connection.query("UPDATE users SET pop = pop - 5 WHERE username = ?", [req.params.user], function (err) {
+									if (err) throw err;
+								})
+							}
+							else {
+								connection.query("UPDATE users SET pop = 0 WHERE username = ?", [req.params.user], function (err) {
+									if (err) throw err;
+								})
+							}
 						}
 					})
-					infos.pop -= 5;
+					if (infos.pop >= 5) {
+						infos.pop -= 5;
+					}
+					else {
+						infos.pop = 0;
+					}
 					infos.follow = "you report " + rows[0].firstname;
 					infos.birth = profile.age(rows[0].birthday);
 					connection.query("SELECT * FROM pictures WHERE username = ? AND pic != ?", [req.params.user, rows[0].profil_pic], function (err, pic) {
