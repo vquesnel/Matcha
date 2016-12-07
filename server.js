@@ -116,8 +116,6 @@ app.get('/search', function (req, res) {
 			var tag_tofind = [];
 			var firstword = req.query.search[0].split(" ")[0];
 			var lastword = req.query.search[0].split(" ")[1];
-			console.log(firstword);
-			console.log(lastword);
 			connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
 				if (err) throw err;
 				if (!rows[0].profil_pic) {
