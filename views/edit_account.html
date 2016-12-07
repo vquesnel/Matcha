@@ -14,10 +14,9 @@
 
 <body>
 	<div class="menu">
-		 <form method="post" action="/search" class="search-form">
-            <input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
-            <input id="go" type="submit" name="search" value="Go!">
-        </form>
+		<form method="get" action="/search" class="search-form">
+			<input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
+			<input id="go" type="submit" name="search" value="Go!"> </form>
 		<a href="match.html"> <img id="menu-logo" src="img/mini-logo.png" alt="mini-logo"></a>
 		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
 		<a href="profile.html"><img class="menu-img" src="/img/account.png"></a>
@@ -47,7 +46,7 @@
 				<form class="password-changer" method="post">
 					<input class="submit-btn" type="submit" name="sendEmail" value="Send E-mail"> </form>
 			</div>
-			<div class="option c1"><a href="#">Delete Account</a></div>
+			<div class="option c1"><a href="/delete_account.html">Delete Account</a></div>
 		</div>
 		<div class="separator"></div>
 		<div class="separator"></div>

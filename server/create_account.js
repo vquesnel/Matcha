@@ -16,11 +16,15 @@ function isValid(str) {
 }
 exports.form_checker = function (firstname, lastname, birthday, username, email, conf_email, password, conf_password, sexe) {
 	var ret = '';
+	var regEmail = new RegExp('^[0-9a-z._-]+@{1}[0-9a-z.-]{2,}[.]{1}[a-z]{2,5}$', 'i');
+	var regDate = new RegExp('[0-9]{4}-[0-1][0-9]-[0-3][0-9]', 'i');
 	if (!firstname) return ('Please enter a firstname');
 	else if (!lastname) return ('Please enter a lastname');
-	else if (!birthday) return ('Please enter a birthday');
+	if (!regDate.test(birthday)) return ('Invalid date format')
+	var date = birthday.split('-');
+	if (date[1] > 12 || date[2] > 31) return ('Invalid date format');
 	else if (!isValid(username)) return ('Please enter an username with only valids characters');
-	else if (!email) return ('Please enter an email');
+	else if (!regEmail.test(email)) return ('Please enter a valid email');
 	else if (!conf_email) return ('Please enter an email confirmation');
 	else if (!password) return ('Please enter a password');
 	else if (!conf_password) return ('Please enter a password confirmation');

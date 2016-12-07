@@ -229,10 +229,35 @@
 	}
 }
 
-#phrasepicture {
-	width: 400px;
-	align: center;
-	color: rgb(145, 145, 145);
-	margin-left: 150px;
+.hud-tags {
+	width: 100%;
+	margin-top: 20px;
+	max-width: 1000px;
+}
+
+.tag {
+	background: white;
 	display: inline-block;
+	height: 30px;
+	border-radius: 5px;
+	line-height: 30px;
+	padding: 10px;
+	vertical-align: middle;
+}
+
+.tag:hover {
+	background: #7fc4ff;
+}
+
+.tag:hover a {
+	color: white;
+}
+
+.tag a {
+	color: #8e8e8e;
+}
+
+.tag img {
+	width: 20px;
+	vertical-align: middle;
 }
