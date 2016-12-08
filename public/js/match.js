@@ -1,21 +1,3 @@
-/*$(document).ready(function () {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showLocation, errorHandler, {
-            enableHighAccuracy: false,
-            maximumAge: 60000,
-            timeout: 27000
-        });
-    } else {
-        alert('Votre navigateur ne prend malheureusement pas en charge la géolocalisation.');
-    }
-});
-function showLocation(position) {
-    document.write('Latitude : ' + position.coords.latitude + ' - Longitude : ' + position.coords.longitude);
-}
-function errorHandler(error) {
-    console.log('Geolocation error : code ' + error.code + ' - ' + error.message);
-    alert('Une erreur est survenue durant la géolocalisation. Veuillez réessayer plus tard ou contacter le support.');
-}*/
 $(document).ready(function () {
 	var socket = io.connect('https://localhost:4433');
 	var currgeocoder;
@@ -37,7 +19,7 @@ $(document).ready(function () {
 	//Get geo location result
 	function processGeolocationResult(position) {
 		html5Lat = position.coords.latitude; //Get latitude
-		html5Lon = position.coords.longitude; //Get longitude
+		html5Lon = position.coords.longitude;
 		html5TimeStamp = position.timestamp; //Get timestamp
 		html5Accuracy = position.coords.accuracy; //Get accuracy in meters
 		return (html5Lat).toFixed(8) + ", " + (html5Lon).toFixed(8);
@@ -47,11 +29,11 @@ $(document).ready(function () {
 		currgeocoder = new google.maps.Geocoder();
 		if (latcurr != '' && longcurr != '') {
 			var myLatlng = new google.maps.LatLng(latcurr, longcurr);
-			return getCurrentAddress(myLatlng);
+			return getCurrentAddress(myLatlng, latcurr, longcurr);
 		}
 	}
 	//Get current address
-	function getCurrentAddress(location) {
+	function getCurrentAddress(location, latcurr, longcurr) {
 		currgeocoder.geocode({
 			'location': location
 		}, function (results, status) {
@@ -59,6 +41,8 @@ $(document).ready(function () {
 				currentloc.push(results[0].formatted_address);
 				socket.emit("location", {
 					location: currentloc
+					, lat: latcurr
+					, long: longcurr
 				});
 			}
 			else {
@@ -68,7 +52,7 @@ $(document).ready(function () {
 	}
 });
 var table = $('table');
-$('#location, #popscore , #age, #firstname').wrapInner('<span title="sort this column"/>').each(function () {
+$('#location, #popscore , #age, #firstname, #tags').wrapInner('<span title="sort this column"/>').each(function () {
 	var th = $(this)
 		, thIndex = th.index()
 		, inverse = false;

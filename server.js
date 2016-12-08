@@ -70,7 +70,7 @@ connection.connect(function (err) {
 	if (err) throw err;
 });
 connection.query("CREATE DATABASE IF NOT EXISTS matcha CHARACTER SET = utf8mb4 COLLATE = utf8mb4_bin;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`users` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(255) NOT NULL , `lastname` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `birthday` DATE NOT NULL , `email` VARCHAR(255) NOT NULL , `password` VARCHAR(255) NOT NULL , `sexe` VARCHAR(8) NOT NULL , `token` VARCHAR(255) NOT NULL , `validation` VARCHAR(1) NOT NULL DEFAULT '0' ,  `profil_pic` LONGTEXT DEFAULT NULL, `sexual_or` VARCHAR(10) NOT NULL DEFAULT 'bi' , `bio` VARCHAR(255) DEFAULT NULL , `location` VARCHAR(255) DEFAULT NULL ,  `pop` INT(5) DEFAULT '0', login VARCHAR(255), `sessionID` VARCHAR(255) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4  COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`users` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `firstname` VARCHAR(255) NOT NULL , `lastname` VARCHAR(255) NOT NULL , `username` VARCHAR(255) NOT NULL , `birthday` DATE NOT NULL , `email` VARCHAR(255) NOT NULL , `password` VARCHAR(255) NOT NULL , `sexe` VARCHAR(8) NOT NULL , `token` VARCHAR(255) NOT NULL , `validation` VARCHAR(1) NOT NULL DEFAULT '0' ,  `profil_pic` LONGTEXT DEFAULT NULL, `sexual_or` VARCHAR(10) NOT NULL DEFAULT 'bi' , `bio` VARCHAR(255) DEFAULT NULL , `location` VARCHAR(255) DEFAULT NULL, `currlat` DECIMAL(11, 8) NOT NULL, `currlong` DECIMAL( 11, 8 ) NOT NULL, `pop` INT(5) DEFAULT '0', login VARCHAR(255), `sessionID` VARCHAR(255) DEFAULT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4  COLLATE utf8mb4_bin;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`pictures` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `pic` LONGTEXT NOT NULL , `username` VARCHAR(255) NOT NULL,  PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`history` ( `visitor` VARCHAR(255) NOT NULL , `visited` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`liking` ( `liker` VARCHAR(255) NOT NULL , `liked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
@@ -80,6 +80,7 @@ connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`matchs` ( `matcher` VARCH
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`block` ( `block_by` VARCHAR(255) NOT NULL , `blocked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`UserComment` ( `UserId` INT(5) NOT NULL , UserName VARCHAR(255) NOT NULL , `Comment` VARCHAR(255) NOT NULL) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`notification` (`id` INT(5) NOT NULL AUTO_INCREMENT, `sender` VARCHAR(255) NOT NULL , `sended` VARCHAR(255) NOT NULL, `content` VARCHAR(255) NOT NULL, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`dictionary` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `value` VARCHAR(255) NOT NULL , `score` INT(5) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB  CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection.query("use matcha");
 connection.query("SET CHARACTER SET utf8mb4");
 /*     P  A  G  E  S      R  E  Q  U  E  S  T  S     -     E X P R E S S     */
@@ -116,14 +117,16 @@ app.get('/search', function (req, res) {
 			var tag_tofind = [];
 			var firstword = req.query.search[0].split(" ")[0];
 			var lastword = req.query.search[0].split(" ")[1];
-			connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
+			connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, row) {
 				if (err) throw err;
-				if (!rows[0].profil_pic) {
+				if (!row[0].profil_pic) {
 					res.redirect("/edit_profil.html");
 				}
 				connection.query("SELECT tag FROM tags WHERE username= ?", [req.session.username], function (err, tags) {
-					for (var p in tags) {
-						tag_me[p] = tags[p].tag;
+					if (tags[0]) {
+						for (var p in tags) {
+							tag_me[p] = tags[p].tag;
+						}
 					}
 					if (req.query.pop) {
 						pop_min = req.query.pop.split(";")[0];
@@ -150,6 +153,7 @@ app.get('/search', function (req, res) {
 										var z = 0;
 										rows[k].birth = profile.age(rows[k].birthday);
 										rows[k].communtag = 0;
+										rows[k].distance = getDistanceFromLatLonInKm(row[0].currlat, row[0].currlong, rows[k].currlat, rows[k].currlong);
 										(function (k) {
 											connection.query("SELECT tag FROM tags WHERE username = ?", [rows[k].username], function (err, tagstofind) {
 												for (var a in tagstofind) {
@@ -159,8 +163,10 @@ app.get('/search', function (req, res) {
 												}
 												if (Number(rows[k].birth) >= Number(age_min) && Number(rows[k].birth) <= Number(age_max)) {
 													if (Number(rows[k].communtag) >= Number(tag_min) && Number(rows[k].communtag) <= Number(tag_max)) {
-														people[z] = rows[k];
-														z++;
+														if (Number(rows[k].distance) >= Number(loc_min) && Number(rows[k].distance) <= Number(loc_max)) {
+															people[z] = rows[k];
+															z++;
+														}
 													}
 												}
 												if (!rows[Number(k) + 1]) {
@@ -189,6 +195,7 @@ app.get('/search', function (req, res) {
 										var z = 0;
 										rows[k].birth = profile.age(rows[k].birthday);
 										rows[k].communtag = 0;
+										rows[k].distance = getDistanceFromLatLonInKm(row[0].currlat, row[0].currlong, rows[k].currlat, rows[k].currlong);
 										(function (k) {
 											connection.query("SELECT tag FROM tags WHERE username = ?", [rows[k].username], function (err, tagstofind) {
 												for (var a in tagstofind) {
@@ -198,8 +205,10 @@ app.get('/search', function (req, res) {
 												}
 												if (Number(rows[k].birth) >= Number(age_min) && Number(rows[k].birth) <= Number(age_max)) {
 													if (Number(rows[k].communtag) >= Number(tag_min) && Number(rows[k].communtag) <= Number(tag_max)) {
-														people[z] = rows[k];
-														z++;
+														if (Number(rows[k].distance) >= Number(loc_min) && Number(rows[k].distance) <= Number(loc_max)) {
+															people[z] = rows[k];
+															z++;
+														}
 													}
 												}
 												if (!rows[Number(k) + 1]) {
@@ -235,80 +244,153 @@ app.get('/search', function (req, res) {
 		else if (req.query.search) {
 			var firstword = req.query.search[0].split(" ")[0];
 			var lastword = req.query.search[0].split(" ")[1];
-			if (firstword && lastword) {
-				connection.query("SELECT username FROM users WHERE (firstname = ? AND lastname = ?) OR (firstname = ? AND lastname = ?)", [firstword, lastword, lastword, firstword], function (err, rows) {
-					if (err) throw err;
-					if (rows[0] && !rows[1]) {
-						if (rows[0].username === req.session.username) {
-							res.redirect('/profile.html');
-						}
-						else {
-							res.redirect('/users.html/' + rows[0].username)
-						}
+			var tag_me = [];
+			var tag_tofind = [];
+			connection.query("SELECT tag FROM tags WHERE username= ?", [req.session.username], function (err, tags) {
+				if (tags[0]) {
+					for (var p in tags) {
+						tag_me[p] = tags[p].tag;
 					}
-					else {
-						connection.query('SELECT * from users where (firstname like "%' + firstword + '%" AND lastname like "%' + lastword + '%") OR (firstname like "%' + lastword + '%" AND lastname like "%' + firstword + '%")', function (err, rows) {
-							if (err) throw err;
-							if (rows[0]) {
-								for (var k in rows) {
-									rows[k].birth = profile.age(rows[k].birthday);
-								}
-								res.render("search.html", {
-									search: req.query.search[0]
-									, homepage: {
-										infos: rows
-									}
-								})
+				}
+				if (firstword && lastword) {
+					var tag_tofind = [];
+					connection.query("SELECT username FROM users WHERE (firstname = ? AND lastname = ?) OR (firstname = ? AND lastname = ?)", [firstword, lastword, lastword, firstword], function (err, rows) {
+						if (err) throw err;
+						if (rows[0] && !rows[1]) {
+							if (rows[0].username === req.session.username) {
+								res.redirect('/profile.html');
 							}
 							else {
-								res.render("search.html", {
-									message: "Nobobdy match this name"
-								})
+								res.redirect('/users.html/' + rows[0].username)
 							}
-						})
-					}
-				})
-			}
-			else if (firstword && !lastword) {
-				connection.query("SELECT username FROM users WHERE (firstname = ?  OR  lastname = ?)", [firstword, firstword], function (err, rows) {
-					if (err) throw err;
-					if (rows[0] && !rows[1]) {
-						if (rows[0].username === req.session.username) {
-							res.redirect('/profile.html');
 						}
 						else {
-							res.redirect('/users.html/' + rows[0].username)
-						}
-					}
-					else {
-						connection.query('SELECT * from users where firstname like "%' + firstword + '%"  OR  lastname like "%' + firstword + '%"', function (err, rows) {
-							if (err) throw err;
-							if (rows[0]) {
-								for (var k in rows) {
-									rows[k].birth = profile.age(rows[k].birthday);
+							connection.query('SELECT * from users where (firstname like "%' + firstword + '%" AND lastname like "%' + lastword + '%") OR (firstname like "%' + lastword + '%" AND lastname like "%' + firstword + '%")', function (err, rows) {
+								if (err) throw err;
+								if (!rows[0]) {
+									res.render("search.html", {
+										message: "Nobobdy match this name"
+									})
 								}
-								res.render("search.html", {
-									search: req.query.search[0]
-									, homepage: {
-										infos: rows
-									}
-								})
+								else {
+									(function (callback) {
+										for (var k in rows) {
+											var z = 0;
+											rows[k].birth = profile.age(rows[k].birthday);
+											rows[k].communtag = 0;
+											(function (k) {
+												connection.query("SELECT tag FROM tags WHERE username = ?", [rows[k].username], function (err, tagstofind) {
+													for (var a in tagstofind) {
+														if (tag_me.includes(tagstofind[a].tag) === true) {
+															rows[k].communtag = rows[k].communtag + 1;
+														}
+													}
+													if (!rows[Number(k) + 1]) {
+														callback(rows);
+													}
+												})
+											})(k);
+										}
+									})(function (people) {
+										res.render("search.html", {
+											search: req.query.search[0]
+											, homepage: {
+												infos: rows
+											}
+										})
+									})
+								}
+							})
+						}
+					})
+				}
+				else if (firstword && !lastword) {
+					connection.query("SELECT username FROM users WHERE (firstname = ?  OR  lastname = ?)", [firstword, firstword], function (err, rows) {
+						if (err) throw err;
+						if (rows[0] && !rows[1]) {
+							if (rows[0].username === req.session.username) {
+								res.redirect('/profile.html');
 							}
 							else {
-								res.render("search.html", {
-									message: "Nobobdy match this name"
-								})
+								res.redirect('/users.html/' + rows[0].username)
 							}
-						})
-					}
-				})
-			}
-			else {
-				res.redirect(req.get('referer'));
-			}
+						}
+						else {
+							connection.query('SELECT * from users where firstname like "%' + firstword + '%"  OR  lastname like "%' + firstword + '%"', function (err, rows) {
+								if (err) throw err;
+								if (!rows[0]) {
+									res.render("search.html", {
+										message: "Nobobdy match this name"
+									})
+								}
+								else {
+									(function (callback) {
+										for (var k in rows) {
+											var z = 0;
+											rows[k].birth = profile.age(rows[k].birthday);
+											rows[k].communtag = 0;
+											(function (k) {
+												connection.query("SELECT tag FROM tags WHERE username = ?", [rows[k].username], function (err, tagstofind) {
+													for (var a in tagstofind) {
+														if (tag_me.includes(tagstofind[a].tag) === true) {
+															rows[k].communtag = rows[k].communtag + 1;
+														}
+													}
+													if (!rows[Number(k) + 1]) {
+														callback(rows);
+													}
+												})
+											})(k);
+										}
+									})(function (people) {
+										res.render("search.html", {
+											search: req.query.search[0]
+											, homepage: {
+												infos: rows
+											}
+										})
+									})
+								}
+							})
+						}
+					})
+				}
+				else {
+					res.redirect(req.get('referer'));
+				}
+			})
 		}
 	}
 });
+app.get('/hashtags.html', function (req, res) {
+	connection.query("SELECT DISTINCT * FROM dictionary", function (err, rows) {
+		if (err) throw err;
+		else {
+			res.render('hashtags.html', {
+				dictionary: {
+					value: rows
+				}
+			})
+		}
+	})
+})
+app.get('/hashtags/:data', function (req, res) {
+	if (!req.params.data) {
+		res.redirect('/hashtags.html')
+	}
+	else {
+		connection.query("SELECT DISTINCT * FROM dictionary WHERE substr(value, 1, 1) = ?", [req.params.data], function (err, rows) {
+			if (err) throw err;
+			else {
+				res.render('hashtags.html', {
+					dictionary: {
+						value: rows
+					}
+				})
+			}
+		})
+	}
+})
 app.post('/', function (req, res) {
 	var ret = index.index_checker(req.body.username, req.body.password);
 	if (ret) {
@@ -579,6 +661,19 @@ app.post('/update', function (req, res) {
 									if (err) throw err;
 								})
 							}
+							connection.query('SELECT * FROM dictionary WHERE value = ?', [results[k]], function (err, row_dic) {
+								if (err) throw err;
+								if (!row_dic[0]) {
+									connection.query("INSERT INTO dictionary(value, score) VALUES(?,1)", [results[k]], function (err) {
+										if (err) throw err;
+									})
+								}
+								if (row_dic[0]) {
+									connection.query("UPDATE dictionary SET score = score + 1 WHERE value = ?", [row_dic[0].value], function (err) {
+										if (err) throw err;
+									})
+								}
+							})
 						}
 					})
 				})(k);
@@ -660,9 +755,11 @@ app.get('/match.html', function (req, res) {
 		var tag_min = 0;
 		var tag_max = 50;
 		var tag_me = [];
-		connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, rows) {
+		var sexe_tomatch;
+		var sexe_tonotmatch;
+		connection.query("SELECT * FROM users WHERE username = ?", [req.session.username], function (err, row) {
 			if (err) throw err;
-			if (!rows[0].profil_pic) {
+			if (!row[0].profil_pic) {
 				res.redirect("/edit_profil.html");
 			}
 			connection.query("SELECT tag FROM tags WHERE username= ?", [req.session.username], function (err, tags) {
@@ -685,42 +782,107 @@ app.get('/match.html', function (req, res) {
 					tag_min = req.query.tag.split(";")[0];
 					tag_max = req.query.tag.split(";")[1];
 				}
-				connection.query("SELECT * FROM users WHERE (pop BETWEEN ? AND ?) AND username != ?", [pop_min, pop_max, req.session.username], function (err, rows) {
-					if (err) throw err;
-					else {
-						(function (callback) {
-							var z = 0;
-							for (var k in rows) {
-								rows[k].birth = profile.age(rows[k].birthday);
-								rows[k].communtag = 0;
-								(function (k) {
-									connection.query("SELECT tag FROM tags WHERE username = ?", [rows[k].username], function (err, tagstofind) {
-										for (var a in tagstofind) {
-											if (tag_me.includes(tagstofind[a].tag) === true) {
-												rows[k].communtag = rows[k].communtag + 1;
-											}
-										}
-										if (Number(rows[k].birth) >= Number(age_min) && Number(rows[k].birth) <= Number(age_max)) {
-											if (Number(rows[k].communtag) >= Number(tag_min) && Number(rows[k].communtag) <= Number(tag_max)) {
-												people[z] = rows[k];
-												z++;
-											}
-										}
-										if (!rows[Number(k) + 1]) {
-											callback(people);
-										}
-									})
-								})(k);
-							}
-						})(function (people) {
-							res.render("match.html", {
-								homepage: {
-									infos: people
-								}
-							})
-						})
+				if (req.session.sexe === "male") {
+					if (req.session.sexual_or === "bi") {
+						sexe_tonotmatch = ["male", "hetero", "female", "gay"]
 					}
-				})
+					else if (req.session.sexual_or === "hetero") {
+						sexe_tomatch = ["female", "hetero", "bi"];
+					}
+					else if (req.session.sexual_or === "gay") {
+						sexe_tomatch = ["male", "gay", "bi"];
+					}
+				}
+				else if (req.session.sexe === "female") {
+					if (req.session.sexual_or === "bi") {
+						sexe_tonotmatch = ["female", "hetero", "male", "gay"]
+					}
+					else if (req.session.sexual_or === "hetero") {
+						sexe_tomatch = ["male", "hetero", "bi"];
+					}
+					else if (req.session.sexual_or === "gay") {
+						sexe_tomatch = ["female", "gay", "bi"];
+					}
+				}
+				if (sexe_tomatch) {
+					connection.query("SELECT * FROM users WHERE (pop BETWEEN ? AND ?) AND username != ? AND profil_pic is not null AND (sexe = ? AND (sexual_or = ? OR sexual_or = ?))", [pop_min, pop_max, req.session.username, sexe_tomatch[0], sexe_tomatch[1], sexe_tomatch[2]], function (err, rows) {
+						if (err) throw err;
+						else {
+							(function (callback) {
+								var z = 0;
+								for (var k in rows) {
+									rows[k].distance = getDistanceFromLatLonInKm(row[0].currlat, row[0].currlong, rows[k].currlat, rows[k].currlong);
+									rows[k].birth = profile.age(rows[k].birthday);
+									rows[k].communtag = 0;
+									(function (k) {
+										connection.query("SELECT tag FROM tags WHERE username = ?", [rows[k].username], function (err, tagstofind) {
+											for (var a in tagstofind) {
+												if (tag_me.includes(tagstofind[a].tag) === true) {
+													rows[k].communtag = rows[k].communtag + 1;
+												}
+											}
+											if (Number(rows[k].birth) >= Number(age_min) && Number(rows[k].birth) <= Number(age_max)) {
+												if (Number(rows[k].communtag) >= Number(tag_min) && Number(rows[k].communtag) <= Number(tag_max)) {
+													if (Number(rows[k].distance) >= Number(loc_min) && Number(rows[k].distance) <= Number(loc_max)) {
+														people[z] = rows[k];
+														z++;
+													}
+												}
+											}
+											if (!rows[Number(k) + 1]) {
+												callback(people);
+											}
+										})
+									})(k);
+								}
+							})(function (people) {
+								res.render("match.html", {
+									homepage: {
+										infos: people
+									}
+								})
+							})
+						}
+					})
+				}
+				else if (sexe_tonotmatch) {
+					connection.query("SELECT * FROM users WHERE (pop BETWEEN ? AND ?) AND username != ? AND profil_pic is not null AND ((sexe = ? AND sexual_or != ?) OR (sexe = ? AND sexual_or != ?))", [pop_min, pop_max, req.session.username, sexe_tonotmatch[0], sexe_tonotmatch[1], sexe_tonotmatch[2], sexe_tonotmatch[3]], function (err, rows) {
+						if (err) throw err;
+						else {
+							(function (callback) {
+								var z = 0;
+								for (var k in rows) {
+									rows[k].birth = profile.age(rows[k].birthday);
+									rows[k].communtag = 0;
+									(function (k) {
+										connection.query("SELECT tag FROM tags WHERE username = ?", [rows[k].username], function (err, tagstofind) {
+											for (var a in tagstofind) {
+												if (tag_me.includes(tagstofind[a].tag) === true) {
+													rows[k].communtag = rows[k].communtag + 1;
+												}
+											}
+											if (Number(rows[k].birth) >= Number(age_min) && Number(rows[k].birth) <= Number(age_max)) {
+												if (Number(rows[k].communtag) >= Number(tag_min) && Number(rows[k].communtag) <= Number(tag_max)) {
+													people[z] = rows[k];
+													z++;
+												}
+											}
+											if (!rows[Number(k) + 1]) {
+												callback(people);
+											}
+										})
+									})(k);
+								}
+							})(function (people) {
+								res.render("match.html", {
+									homepage: {
+										infos: people
+									}
+								})
+							})
+						}
+					})
+				}
 			})
 		})
 	}
@@ -752,7 +914,7 @@ app.get("/match_people.html", function (req, res) {
 						})
 					})(j, function () {
 						res.render("result.html", {
-							homepage: {
+							result: {
 								infos: infos
 							}
 						})
@@ -1224,13 +1386,17 @@ app.get("/message.html", function (req, res) {
 			if (rows[0]) {
 				for (var k in rows) {
 					(function (k) {
-						if (rows[k].matcher !== req.session.username) infos_tmp[k] = {
-							name: rows[k].matcher
-							, id: rows[k].id
+						if (rows[k].matcher !== req.session.username) {
+							infos_tmp[k] = {
+								name: rows[k].matcher
+								, id: rows[k].id
+							}
 						}
-						else if (rows[k].matched !== req.session.username) infos_tmp[k] = {
-							name: rows[k].matched
-							, id: rows[k].id
+						else if (rows[k].matched !== req.session.username) {
+							infos_tmp[k] = {
+								name: rows[k].matched
+								, id: rows[k].id
+							}
 						}
 					})(k);
 				}
@@ -1338,7 +1504,7 @@ app.get("/history.html", function (req, res) {
 						});
 					})(k, function () {
 						res.render("result.html", {
-							homepage: {
+							result: {
 								infos: infos
 							}
 						})
@@ -1376,7 +1542,7 @@ app.get("/blocks.html", function (req, res) {
 						});
 					})(k, function () {
 						res.render("result.html", {
-							blocked_people: {
+							block: {
 								infos: infos
 							}
 						})
@@ -1425,7 +1591,7 @@ app.get("/followers.html", function (req, res) {
 						});
 					})(k, function () {
 						res.render("result.html", {
-							homepage: {
+							result: {
 								infos: infos
 							}
 						})
@@ -1524,7 +1690,7 @@ app.get('/tags.html/:tag', function (req, res) {
 						});
 					})(k, function () {
 						res.render("result.html", {
-							homepage: {
+							result: {
 								infos: infos
 							}
 						})
@@ -1629,13 +1795,13 @@ io.on('connection', function (socket) {
 			var location = data.location;
 			if (location[1]) {
 				var arrondissement = location[1].split(',');
-				connection.query("UPDATE users SET location = ? WHERE sessionID = ?", [arrondissement[1], sessionid], function (err) {
+				connection.query("UPDATE users SET location = ?, currlat =?, currlong = ? WHERE sessionID = ?", [arrondissement[1], data.lat, data.long, sessionid], function (err) {
 					if (err) throw err;
 				});
 			}
 			else {
 				var arrondissement = location[0].split(',');
-				connection.query("UPDATE users SET location = ? WHERE sessionID = ?", [arrondissement[1], sessionid], function (err) {
+				connection.query("UPDATE users SET location = ?, currlat =?, currlong = ? WHERE sessionID = ?", [arrondissement[1], data.lat, data.long, sessionid], function (err) {
 					if (err) throw err;
 				});
 			}
@@ -1650,3 +1816,17 @@ io.on('connection', function (socket) {
 		console.log(err);
 	})
 });
+
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+	var R = 6371; // Radius of the earth in km
+	var dLat = deg2rad(lat2 - lat1); // deg2rad below
+	var dLon = deg2rad(lon2 - lon1);
+	var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * Math.sin(dLon / 2) * Math.sin(dLon / 2);
+	var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+	var d = R * c; // Distance in km
+	return d;
+}
+
+function deg2rad(deg) {
+	return deg * (Math.PI / 180)
+}
