@@ -1,43 +1,76 @@
 <html>
 
 <head>
-	<meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-	<title>Matcha | Match</title>
-	<link href="/stylesheets/main.css" rel="stylesheet">
-	<link href="/stylesheets/match.css" rel="stylesheet">
-	<script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBylV2tWJmuiBNLN3XK2a-LBtkv3doz6H8"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-	<script src="/js/mustache.js"></script>
-	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
-	<script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
-	<script src="/js/front.js"></script>
-	<script src="/js/sortElements.js"></script>
-	<script src="/js/typeahead.min.js"></script>
-	<script src="/js/search.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <title>Matcha | Match</title>
+    <link href="/stylesheets/main.css" rel="stylesheet">
+    <link href="/stylesheets/match.css" rel="stylesheet">
+    <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBylV2tWJmuiBNLN3XK2a-LBtkv3doz6H8"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+    <script src="https://localhost:4433/socket.io/socket.io.js"></script>
+    <script src="https://twitter.github.io/typeahead.js/releases/latest/typeahead.bundle.js"></script>
+    <script src="/js/front.js"></script>
+    <script src="/js/sortElements.js"></script>
+    <script src="/js/typeahead.min.js"></script>
+    <script src="/js/search.js"></script>
 </head>
 
 <body>
-	<div class="menu">
-		<form method="get" action="/search" class="search-form">
-			<input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
-			<input id="go" type="submit" name="search" value="Go!"> </form>
-		<a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
-		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
-		<a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
-		<a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
-		<a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>
-	</div>
-	<div class="separator"></div>
-	<div class="separator"></div>
-	<div class="separator"></div>
-	<div class="separator"></div>
-	<div class="site-content" align="center">
-		<div class="alpabet"> <a href="/hashtags.html">#</a> <a href="/hashtags/a">a</a> <a href="/hashtags/b">b</a> <a href="/hashtags/c">c</a> <a href="/hashtags/d">d</a> <a href="/hashtags/e">e</a> <a href="/hashtags/f">f</a> <a href="/hashtags/g">g</a> <a href="/hashtags/h">h</a> <a href="/hashtags/i">i</a> <a href="/hashtags/j">j</a> <a href="/hashtags/k">k</a> <a href="/hashtags/l">l</a> <a href="/hashtags/m">m</a> <a href="/hashtags/n">n</a> <a href="/hashtags/o">o</a> <a href="/hashtags/p">p</a> <a href="/hashtags/q">q</a> <a href="/hashtags/r">r</a> <a href="/hashtags/s">s</a> <a href="/hashtags/t">t</a> <a href="/hashtags/u">u</a> <a href="/hashtags/v">v</a> <a href="/hashtags/w">w</a> <a href="/hashtags/x">x</a> <a href="/hashtags/y">y</a> <a href="/hashtags/y">y</a> </div>
-		<div class="hashtags-title">#ash Tags</div> {{>homepage_test}} </div>
-	<div class="separator"></div>
-	<div class="separator"></div>
-	<div class="separator"></div>
+    <div class="menu">
+        <form method="post" action="/search" class="search-form">
+            <input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
+            <input id="go" type="submit" name="search" value="Go!">
+        </form>
+        <a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
+        <a href="#"><img class="menu-img" src="/img/feed.png"></a>
+        <a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
+        <a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
+        <a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>
+    </div>
+    <div class="separator"></div>
+    <div class="separator"></div>
+    <div class="separator"></div>
+    <div class="separator"></div>
+    <div class="site-content" align="center">
+        <div class="alphabet">
+            <a href="/hashtags.html">#</a>
+            <a href="/hashtags/number">123</a>
+            <a href="/hashtags/a">a</a>
+            <a href="/hashtags/b">b</a>
+            <a href="/hashtags/c">c</a>
+            <a href="/hashtags/d">d</a>
+            <a href="/hashtags/e">e</a>
+            <a href="/hashtags/f">f</a>
+            <a href="/hashtags/g">g</a>
+            <a href="/hashtags/h">h</a>
+            <a href="/hashtags/i">i</a>
+            <a href="/hashtags/j">j</a>
+            <a href="/hashtags/k">k</a>
+            <a href="/hashtags/l">l</a>
+            <a href="/hashtags/m">m</a>
+            <a href="/hashtags/n">n</a>
+            <a href="/hashtags/o">o</a>
+            <a href="/hashtags/p">p</a>
+            <a href="/hashtags/q">q</a>
+            <a href="/hashtags/r">r</a>
+            <a href="/hashtags/s">s</a>
+            <a href="/hashtags/t">t</a>
+            <a href="/hashtags/u">u</a>
+            <a href="/hashtags/v">v</a>
+            <a href="/hashtags/w">w</a>
+            <a href="/hashtags/x">x</a>
+            <a href="/hashtags/y">y</a>
+            <a href="/hashtags/z">z</a>
+        </div>
+        <div class="hashtags-title">#ash Tags</div>
+        <div class="dictionary" align="left">{{>homepage_test}}</div>
+        {{{message}}}
+    </div>
+
+    <div class="separator"></div>
+    <div class="separator"></div>
+    <div class="separator"></div>
 </body>
 
 </html>
