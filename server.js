@@ -380,7 +380,7 @@ app.get('/search', function (req, res) {
 });
 app.get('/hashtags.html', function (req, res) {
 	if (req.session.username) {
-		connection.query("SELECT DISTINCT * FROM dictionary", function (err, rows) {
+		connection.query("SELECT DISTINCT * FROM dictionary ORDER BY value", function (err, rows) {
 			if (err) throw err;
 			else {
 				res.render('hashtags.html', {
@@ -401,7 +401,7 @@ app.get('/hashtags/:data', function (req, res) {
 			res.redirect('/hashtags.html')
 		}
 		if (req.params.data === 'number') {
-			connection.query("SELECT DISTINCT * FROM dictionary WHERE value REGEXP  '[0-9]'", function (err, rows) {
+			connection.query("SELECT DISTINCT * FROM dictionary WHERE value REGEXP  '[0-9]' ORDER BY value", function (err, rows) {
 				if (err) throw err;
 				else {
 					res.render('hashtags.html', {
@@ -413,7 +413,7 @@ app.get('/hashtags/:data', function (req, res) {
 			})
 		}
 		else {
-			connection.query("SELECT DISTINCT * FROM dictionary WHERE substr(value, 1, 1) = ?", [req.params.data], function (err, rows) {
+			connection.query("SELECT DISTINCT * FROM dictionary WHERE substr(value, 1, 1) = ? ORDER BY value", [req.params.data], function (err, rows) {
 				if (err) throw err;
 				else {
 					res.render('hashtags.html', {
@@ -906,10 +906,10 @@ app.get('/match.html', function (req, res) {
 									}
 								}
 								else {
-									callback(null);
+									callback(people);
 								}
 							})(function (people) {
-								if (people) {
+								if (people[0]) {
 									res.render("match.html", {
 										homepage: {
 											infos: people
@@ -956,7 +956,7 @@ app.get('/match.html', function (req, res) {
 									}
 								}
 								else {
-									callback(null);
+									callback(people);
 								}
 							})(function (people) {
 								if (people[0]) {
@@ -1819,6 +1819,11 @@ app.get('/tags.html/:tag', function (req, res) {
 					});
 				}
 			}
+			else {
+				res.render("result.html", {
+					message: "nobody have this tags"
+				})
+			}
 		})
 	}
 })
@@ -1899,14 +1904,11 @@ io.on('connection', function (socket) {
 	})
 	var clients_in_the_room = io.sockets.adapter.rooms;
 	for (var clientId in clients_in_the_room) {
-		console.log('client: %s', clientId); //Seeing is believing 
 		var client_socket = io.sockets.connected[clientId]; //Do whatever you want with this
 	}
 	socket.on("room", function (data) {
-		//console.log(data);
 		socket.join(data.room);
 		socket.room = data.room;
-		console.log(socket.room);
 	})
 	socket.on("changeprofile_pic", function (data) {
 		data.picture = data.picture.replace("https://localhost:4433/", "");

@@ -16,7 +16,6 @@
 	<script src="/js/front.js"></script>
 	<script src="/js/search.js"></script>
 	<script src="/js/sortElements.js"></script>
-
 </head>
 
 <body>
@@ -35,12 +34,18 @@
 	<div class="separator"></div>
 	<div class="separator"></div>
 	<div class="site-content" align="center">
-		<form method="get">
-			<div>AGE
-				<input type="text" id="age" value="" name="age" /> POP
-				<input type="text" id="pop" value="" name="pop" /> LOC
-				<input type="text" id="loc" value="" name="loc" /> TAG
-				<input type="text" id="tag" value="" name="tag" />
+		<form method="get" id="from-slider">
+			<div>
+				<div class="slider-left">
+					<div class="slider-title">Age</div>
+					<input type="text" id="age" value="" name="age" />
+					<div class="slider-title">Popularity</div>
+					<input type="text" id="pop" value="" name="pop" /> </div>
+				<div class="slider-right">
+					<div class="slider-title">Location</div>
+					<input type="text" id="loc" value="" name="loc" />
+					<div class="slider-title">Commun Tags</div>
+					<input type="text" id="tag" value="" name="tag" /> </div>
 				<input id="filter" type="submit" name="submit" value="filter"> </div>
 		</form>
 		<table id="match" class="hud" align="center">
