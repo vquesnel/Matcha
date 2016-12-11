@@ -105,9 +105,14 @@ app.get("/comment.html", function (req, res) {
     res.render("comment.html", {})
 });
 app.get('/', function (req, res) {
-    res.render("index.html", {})
-    console.log(req.sessionID);
-
+    connection.query("SELECT * FROM users WHERE sessionID = ?", [req.sessionID], function (err, connect) {
+        if (err) throw err;
+        if (!connect[0]) {
+            res.render("index.html", {})
+        } else {
+            res.redirect("/profile.html");
+        }
+    })
 });
 
 app.get('/search', function (req, res) {
@@ -462,7 +467,6 @@ app.get('/addtag/:data', function (req, res) {
     }
 });
 app.post('/', function (req, res) {
-    console.log(req.sessionID);
     var ret = index.index_checker(req.body.username, req.body.password);
     if (ret) {
         res.render('index.html', {
@@ -1012,7 +1016,6 @@ app.get("/match_people.html", function (req, res) {
     }
 });
 app.get('/profile.html', function (req, res) {
-    console.log(req.sessionID);
     if (!req.session.username) {
         res.redirect("/");
     } else {
@@ -1854,20 +1857,16 @@ io.on('connection', function (socket) {
         if (err) throw err;
 
     })
-    connection.query("SELECT username FROm users WHERE sessionID =?", [sessionid], function (err, rows) {
-            console.log("new user");
-            console.log(rows);
-        })
-        //    connection.query("SELECT COUNT(*) AS notification FROM notification WHERE sended = (SELECT username FROM users WHERE sessionID = ?)", [sessionid], function (err, rows) {
-        //        if (err) throw err;
-        //        if (rows[0]) {
-        //            console.log("socke_id == " + socket.id);
-        //            console.log(rows[0].notification);
-        //            socket.emit("notifcation", {
-        //                notification: rows[0].notification
-        //            });
-        //        }
-        //    });
+    connection.query("SELECT COUNT(*) AS notification FROM notification WHERE sended = (SELECT username FROM users WHERE sessionID = ?)", [sessionid], function (err, rows) {
+        if (err) throw err;
+        if (rows[0]) {
+            console.log("socke_id == " + socket.id);
+            console.log(rows[0].notification);
+            socket.emit("notifcation", {
+                notification: rows[0].notification
+            });
+        }
+    });
     var clients_in_the_room = io.sockets.adapter.rooms;
     for (var clientId in clients_in_the_room) {
         var client_socket = io.sockets.connected[clientId]; //Do whatever you want with this
