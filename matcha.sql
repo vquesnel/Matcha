@@ -3,7 +3,7 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost
--- Generation Time: Dec 09, 2016 at 03:35 PM
+-- Generation Time: Dec 12, 2016 at 04:44 PM
 -- Server version: 5.7.11
 -- PHP Version: 7.0.0
 
@@ -31,13 +31,6 @@ CREATE TABLE `block` (
   `blocked` varchar(255) COLLATE utf8mb4_bin NOT NULL,
   `id` int(5) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-
---
--- Dumping data for table `block`
---
-
-INSERT INTO `block` (`block_by`, `blocked`, `id`) VALUES
-('vico', 'laura', 8);
 
 -- --------------------------------------------------------
 
@@ -139,7 +132,10 @@ INSERT INTO `history` (`visitor`, `visited`, `id`) VALUES
 ('jacques', 'vico', 11),
 ('jacques', 'jb', 12),
 ('jb', 'laura', 13),
-('vico', 'laura', 14);
+('vico', 'laura', 14),
+('corentine', 'jacques', 15),
+('jacques', 'corentine', 16),
+('jacques', 'kiefer', 17);
 
 -- --------------------------------------------------------
 
@@ -158,10 +154,13 @@ CREATE TABLE `liking` (
 --
 
 INSERT INTO `liking` (`liker`, `liked`, `id`) VALUES
-('kiefer', 'vico', 6),
 ('kiefer', 'jb', 7),
 ('jb', 'vico', 8),
-('vico', 'kiefer', 13);
+('corentine', 'vico', 111),
+('corentine', 'jacques', 115),
+('jacques', 'corentine', 120),
+('vico', 'jb', 122),
+('vico', 'laura', 129);
 
 -- --------------------------------------------------------
 
@@ -180,7 +179,8 @@ CREATE TABLE `matchs` (
 --
 
 INSERT INTO `matchs` (`matcher`, `matched`, `id`) VALUES
-('vico', 'kiefer', 2);
+('jacques', 'corentine', 35),
+('vico', 'jb', 36);
 
 -- --------------------------------------------------------
 
@@ -192,129 +192,9 @@ CREATE TABLE `notification` (
   `id` int(5) NOT NULL,
   `sender` varchar(255) COLLATE utf8mb4_bin NOT NULL,
   `sended` varchar(255) COLLATE utf8mb4_bin NOT NULL,
-  `content` varchar(255) COLLATE utf8mb4_bin NOT NULL
+  `content` varchar(255) COLLATE utf8mb4_bin NOT NULL,
+  `date` date DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
-
---
--- Dumping data for table `notification`
---
-
-INSERT INTO `notification` (`id`, `sender`, `sended`, `content`) VALUES
-(1, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(2, 'corentine', 'vico', 'corentine bidaud has visited your profil'),
-(3, 'corentine', 'vico', 'corentine bidaud liked your profil'),
-(4, 'corentine', 'vico', 'corentine bidaud matched with you'),
-(5, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(6, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(7, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(8, 'vico', 'jacques', 'victor quesnel liked your profil'),
-(9, 'jb', 'vico', 'jb marsal has visited your profil'),
-(10, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(11, 'vico', 'jb', 'victor quesnel has visited your profil'),
-(12, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(13, 'vico', 'corentine', 'victor quesnel don\'t like your profil anymore'),
-(14, 'vico', 'corentine', 'victor quesnel liked your profil'),
-(15, 'vico', 'corentine', 'victor quesnel matched with you'),
-(16, 'vico', 'corentine', 'victor quesnel don\'t like your profil anymore'),
-(17, 'vico', 'corentine', 'victor quesnel liked your profil'),
-(18, 'vico', 'corentine', 'victor quesnel matched with you'),
-(19, 'vico', 'corentine', 'victor quesnel don\'t like your profil anymore'),
-(20, 'vico', 'corentine', 'victor quesnel liked your profil'),
-(21, 'vico', 'corentine', 'victor quesnel matched with you'),
-(22, 'vico', 'corentine', 'victor quesnel don\'t like your profil anymore'),
-(23, 'vico', 'corentine', 'victor quesnel don\'t like your profil anymore'),
-(24, 'vico', 'corentine', 'victor quesnel liked your profil'),
-(25, 'vico', 'corentine', 'victor quesnel matched with you'),
-(26, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(27, 'jb', 'vico', 'jb marsal has visited your profil'),
-(28, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(29, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(30, 'vico', 'jacques', 'victor quesnel don\'t like your profil anymore'),
-(31, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(32, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(33, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(34, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(35, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(36, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(37, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(38, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(39, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(40, 'vico', 'jb', 'victor quesnel has visited your profil'),
-(41, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(42, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(43, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(44, 'vico', 'wess', 'victor quesnel has visited your profil'),
-(45, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(46, 'vico', 'wess', 'victor quesnel has visited your profil'),
-(47, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(48, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(49, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(50, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(51, 'vico', 'wess', 'victor quesnel has visited your profil'),
-(52, 'vico', 'wess', 'victor quesnel has visited your profil'),
-(53, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(54, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(55, 'vico', 'wess', 'victor quesnel has visited your profil'),
-(56, 'jacques', 'vico', 'Jacques Simonian has visited your profil'),
-(57, 'jacques', 'jb', 'Jacques Simonian has visited your profil'),
-(58, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(59, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(60, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(61, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(62, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(63, 'vico', 'jb', 'victor quesnel has visited your profil'),
-(64, 'vico', 'jb', 'victor quesnel has visited your profil'),
-(65, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(66, 'vico', 'jb', 'victor quesnel has visited your profil'),
-(67, 'vico', 'jb', 'victor quesnel has visited your profil'),
-(68, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(69, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(70, 'vico', 'kiefer', 'victor quesnel don\'t like your profil anymore'),
-(71, 'vico', 'jb', 'victor quesnel has visited your profil'),
-(72, 'vico', 'jb', 'victor quesnel don\'t like your profil anymore'),
-(73, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(74, 'vico', 'corentine', 'victor quesnel don\'t like your profil anymore'),
-(75, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(76, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(77, 'vico', 'jb', 'victor quesnel has visited your profil'),
-(78, 'vico', 'jacques', 'victor quesnel has visited your profil'),
-(79, 'jb', 'laura', 'jb marsal has visited your profil'),
-(80, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(81, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(82, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(83, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(84, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(85, 'vico', 'laura', 'victor quesnel liked your profil'),
-(86, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(87, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(88, 'vico', 'kiefer', 'victor quesnel liked your profil'),
-(89, 'vico', 'kiefer', 'victor quesnel matched with you'),
-(90, 'vico', 'kiefer', 'victor quesnel don\'t like your profil anymore'),
-(91, 'vico', 'kiefer', 'victor quesnel don\'t like your profil anymore'),
-(92, 'vico', 'kiefer', 'victor quesnel don\'t like your profil anymore'),
-(93, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(94, 'vico', 'kiefer', 'victor quesnel has visited your profil'),
-(95, 'vico', 'kiefer', 'victor quesnel liked your profil'),
-(96, 'vico', 'kiefer', 'victor quesnel matched with you'),
-(97, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(98, 'vico', 'laura', 'victor quesnel don\'t like your profil anymore'),
-(99, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(100, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(101, 'vico', 'laura', 'victor quesnel liked your profil'),
-(102, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(103, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(104, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(105, 'vico', 'laura', 'victor quesnel don\'t like your profil anymore'),
-(106, 'vico', 'laura', 'victor quesnel don\'t like your profil anymore'),
-(107, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(108, 'vico', 'corentine', 'victor quesnel has visited your profil'),
-(109, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(110, 'vico', 'laura', 'victor quesnel liked your profil'),
-(111, 'vico', 'laura', 'victor quesnel has visited your profil'),
-(112, 'vico', 'laura', 'victor quesnel liked your profil'),
-(113, 'vico', 'laura', 'victor quesnel don\'t like your profil anymore'),
-(114, 'vico', 'laura', 'victor quesnel don\'t like your profil anymore'),
-(115, 'vico', 'laura', 'victor quesnel don\'t like your profil anymore');
 
 -- --------------------------------------------------------
 
@@ -333,9 +213,6 @@ CREATE TABLE `pictures` (
 --
 
 INSERT INTO `pictures` (`id`, `pic`, `username`) VALUES
-(1, 'upload/vico-lqmj3mviwd9b8gt.png', 'vico'),
-(2, 'upload/vico-lqmj3mviwd9bn0r.png', 'vico'),
-(3, 'upload/vico-lqmj3mviwd9bq4y.png', 'vico'),
 (5, 'upload/corentine-lqmj4j7iwd9r0tx.png', 'corentine'),
 (6, 'upload/jb-lqmj4j7iwd9suo4.png', 'jb'),
 (7, 'upload/jacques-lqmj4j7iwd9t4bi.png', 'jacques'),
@@ -348,8 +225,15 @@ INSERT INTO `pictures` (`id`, `pic`, `username`) VALUES
 (14, 'upload/kiefer-lqmj4j7iwd9uyq2.png', 'kiefer'),
 (15, 'upload/kiefer-lqmj4j7iwd9v3qs.png', 'kiefer'),
 (17, 'upload/wess-7uscusiwerckxe.png', 'wess'),
-(18, 'upload/vico-7us133aiwf5hj49.png', 'vico'),
-(19, 'upload/laura-7us1g4iiwga2465.png', 'laura');
+(19, 'upload/laura-7us1g4iiwga2465.png', 'laura'),
+(20, 'upload/corentine-7usl1ziwlu0zpm.png', 'corentine'),
+(22, 'upload/corentine-7usl1ziwlu18k6.png', 'corentine'),
+(23, 'upload/corentine-7usl1ziwlu1l34.png', 'corentine'),
+(24, 'upload/vico-7usl1ziwlu4hn7.png', 'vico'),
+(25, 'upload/vico-7usl1ziwlu4l8c.png', 'vico'),
+(26, 'upload/vico-7usl1ziwlu4p57.png', 'vico'),
+(27, 'upload/vico-7usl1ziwlu4uwe.png', 'vico'),
+(28, 'upload/vico-7usl1ziwlu4yhx.png', 'vico');
 
 -- --------------------------------------------------------
 
@@ -432,7 +316,9 @@ INSERT INTO `tags` (`tag`, `username`, `id`) VALUES
 ('yy', 'vico', 56),
 ('yyz', 'vico', 57),
 ('zzz', 'vico', 58),
-('☺️', 'vico', 61);
+('☺️', 'vico', 61),
+('nn', 'corentine', 62),
+('ccd', 'jacques', 63);
 
 -- --------------------------------------------------------
 
@@ -480,13 +366,13 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `firstname`, `lastname`, `username`, `birthday`, `email`, `password`, `sexe`, `token`, `validation`, `profil_pic`, `sexual_or`, `bio`, `location`, `currlat`, `currlong`, `pop`, `login`, `sessionID`, `socket_id`) VALUES
-(1, 'victor', 'quesnel', 'vico', '1993-10-04', 'victor-quesnel@hotmail.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd993nm', '0', 'upload/vico-lqmj3mviwd9bq4y.png', 'hetero', 'Hello World Matcha 😃', ' 75017 Paris', '48.89672670', '2.31838630', 123, 'online', '_6BfqCXQx4MUS1MZ9iD5TRr_Y6CSm9K5', '5kTV0ttnbjk4QHtsAAAI'),
-(2, 'corentine', 'bidaud', 'corentine', '1993-08-09', 'co@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'female', 'lqmj3mviwd99l3f', '0', 'upload/corentine-lqmj4j7iwd9r0tx.png', 'hetero', NULL, ' 75017 Paris', '48.89198600', '2.31928700', 0, 'online', 'Ngi_JpN04ept-ZgakluNGl8BkVmdr7tK', NULL),
-(3, 'Jacques', 'Simonian', 'jacques', '1992-09-22', 'johny@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd9a46x', '0', 'upload/jacques-lqmj4j7iwd9t4bi.png', 'bi', 'ZDP QLF 👑', ' 75004 Paris', '48.86000000', '2.35000000', 0, 'online', 'SOddHnPwqOUweSrSWw-nOkWsZsYQCrzN', NULL),
-(4, 'Kiefer', 'wiessler', 'kiefer', '1992-12-22', 'kwiessle@student.42.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd9aib6', '0', 'upload/kiefer-lqmj4j7iwd9utge.png', 'hetero', 'ZDP ', ' 75017 Paris', NULL, NULL, 17, 'online', 'jAbm7ICzXreQIS_TjrEXNg9YBvHhYJXp', NULL),
-(5, 'jb', 'marsal', 'jb', '1985-10-22', 'jmarsal@student.42.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'female', 'lqmj3mviwd9az6k', '0', 'upload/jb-lqmj4j7iwd9suo4.png', 'gay', 'Coucou tout le monde', ' 75017 Paris', '48.86000000', '2.35000000', 11, 'online', 'aNALvKhlF8Tnins0P8DDqYfq89QC53kg', NULL),
+(1, 'victor', 'quesnel', 'vico', '1993-10-04', 'victor-quesnel@hotmail.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd993nm', '0', 'upload/vico-7usl1ziwlu4yhx.png', 'hetero', 'Hello World Matcha 😃', 'PLUTON', '48.86000000', '2.35000000', 428, '2016-12-12', 'Fi0IBl4rwmGjbjDII3yOO4iffxxzr_L-', 'LPFlz7zB6k0O2_mOAAAq'),
+(2, 'corentine', 'bidaud', 'corentine', '1993-08-09', 'co@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'female', 'lqmj3mviwd99l3f', '0', 'upload/corentine-lqmj4j7iwd9r0tx.png', 'hetero', NULL, ' 75004 Paris', '48.86000000', '2.35000000', 147, '2016-12-12', 'EQ-0PEgtyqwT9q0Ob3R_KD0ZlUAto87c', 'j-WVr2lKkq6Nv-VaAAAx'),
+(3, '😜', 'Simonian', 'jacques', '1992-09-22', 'johny@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd9a46x', '0', 'upload/jacques-lqmj4j7iwd9t4bi.png', 'bi', 'ZDP QLF 👑', ' 75004 Paris', '48.86000000', '2.35000000', 17, '2016-12-12', 'zpN93pG2DkinBSO2DJTNEOuLgL4Ms09m', 'Yb8e-D543dRW7_cjAAAu'),
+(4, 'Kiefer', 'wiessler', 'kiefer', '1992-12-22', 'kwiessle@student.42.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd9aib6', '0', 'upload/kiefer-lqmj4j7iwd9utge.png', 'hetero', 'ZDP ', ' 75017 Paris', '48.86000000', '2.35000000', 19, '2016-12-12', 'XZ5Ay4ZtWKhMi9n0DTnLU5DH774i6I1Q', 'q-U-Vwz9bnk-UEoVAAAH'),
+(5, 'jb', 'marsal', 'jb', '1985-10-22', 'jmarsal@student.42.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'female', 'lqmj3mviwd9az6k', '0', 'upload/jb-lqmj4j7iwd9suo4.png', 'gay', 'Coucou tout le monde', ' 75017 Paris', '48.86000000', '2.35000000', 26, '2016-12-12', '45SPt33zvUG7B5jDkI2vbs1C0Gr0ul0w', 'ZSPcMa7OW28mJE8hAAA0'),
 (7, 'vico', 'vico', 'wess', '1993-10-04', 'wessh@gmail.com', 'c10a80bb6a49178c52c3c0ecbd40c7a0', 'male', '7uscusiwerbn6d', '0', 'upload/wess-7uscusiwerckxe.png', 'gay', NULL, ' 75017 Paris', NULL, NULL, 2, '2016-12-08', '1gh8hXBGYzHgcZzwcOTZSDXUpRMmO-t9', NULL),
-(8, 'Laura', 'LOPESA', 'laura', '1990-10-10', 'laura@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'female', '7us1ftkiwg9fmzo', '0', 'upload/laura-7us1g4iiwga2465.png', 'bi', NULL, ' 75004 Paris', '48.86000000', '2.35000000', 9, '2016-12-08', '1rRTXbeITHI4-aLLw3j9jdxUCFCuR0vD', NULL);
+(8, 'Laura', 'LOPESA', 'laura', '1990-10-10', 'laura@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'female', '7us1ftkiwg9fmzo', '0', 'upload/laura-7us1g4iiwga2465.png', 'bi', NULL, ' 75017 Paris', '48.86000000', '2.35000000', 24, '2016-12-12', 'HQHuCqTwUoeAwohBGIdIOODmmqpVeorc', '6FAZaoLHDVv_BZIhAAAv');
 
 --
 -- Indexes for dumped tables
@@ -560,7 +446,7 @@ ALTER TABLE `users`
 -- AUTO_INCREMENT for table `block`
 --
 ALTER TABLE `block`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `dictionary`
 --
@@ -570,27 +456,27 @@ ALTER TABLE `dictionary`
 -- AUTO_INCREMENT for table `history`
 --
 ALTER TABLE `history`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=15;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=18;
 --
 -- AUTO_INCREMENT for table `liking`
 --
 ALTER TABLE `liking`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=130;
 --
 -- AUTO_INCREMENT for table `matchs`
 --
 ALTER TABLE `matchs`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=37;
 --
 -- AUTO_INCREMENT for table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=116;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT;
 --
 -- AUTO_INCREMENT for table `pictures`
 --
 ALTER TABLE `pictures`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=20;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=29;
 --
 -- AUTO_INCREMENT for table `reports`
 --
@@ -600,7 +486,7 @@ ALTER TABLE `reports`
 -- AUTO_INCREMENT for table `tags`
 --
 ALTER TABLE `tags`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 --
 -- AUTO_INCREMENT for table `users`
 --
