@@ -1934,7 +1934,7 @@ io.on('connection', function (socket) {
     connection.query("UPDATE users SET socket_id= ? WHERE sessionID = ?", [socket.id, sessionid], function (err) {
         if (err) throw err;
     });
-    connection.query("SELECT COUNT(*) AS notification FROM notification WHERE sended = (SELECT username FROM users WHERE sessionID = ?)", [sessionid], function (err, rows) {
+    connection.query("SELECT COUNT(*) AS notification FROM notification WHERE sended = (SELECT username FROM users WHERE sessionID = ?) AND seen = 0", [sessionid], function (err, rows) {
         if (err) throw err;
         if (rows[0]) {
             socket.emit("notification", {
@@ -1946,7 +1946,7 @@ io.on('connection', function (socket) {
         connection.query("SELECT socket_id FROM users WHERE username = ? ", [data.user], function (err, rows) {
             if (Object.keys(io.sockets.sockets).includes(rows[0].socket_id)) {
                 (function (callback) {
-                    connection.query("SELECT COUNT(*) AS notification FROM notification WHERE sended = ?", [data.user], function (err, number) {
+                    connection.query("SELECT COUNT(*) AS notification FROM notification WHERE sended = ? and seen = 0", [data.user], function (err, number) {
                         callback(number);
                     });
                 })(function (number) {
@@ -1961,7 +1961,7 @@ io.on('connection', function (socket) {
         connection.query("SELECT socket_id FROM users WHERE username = ? ", [data.user], function (err, rows) {
             if (Object.keys(io.sockets.sockets).includes(rows[0].socket_id)) {
                 (function (callback) {
-                    connection.query("SELECT COUNT(*) AS notification FROM notification WHERE sended = ?", [data.user], function (err, number) {
+                    connection.query("SELECT COUNT(*) AS notification FROM notification WHERE sended = ? AND seen = 0", [data.user], function (err, number) {
                         callback(number);
                     });
                 })(function (number) {
