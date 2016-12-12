@@ -44,6 +44,13 @@
 	vertical-align: middle;
 }
 
+.notif {
+	display: inline-block;
+	color: #808080;
+	font-size: 15px;
+	vertical-align: middle;
+}
+
 td {
 	text-align: center;
 }

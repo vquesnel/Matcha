@@ -8,18 +8,23 @@
 	<link href="/stylesheets/profile.css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js">
 	</script>
+	<script src="https://localhost:4433/socket.io/socket.io.js">
+	</script>
 	<script src="/js/typeahead.min.js"></script>
 	<script src="/js/mustache.js"></script>
 	<script src="/js/search.js"></script>
 </head>
 
 <body>
+	<script src="/js/main.js"></script>
+	<script src="/js/users.js"></script>
 	<div class="menu">
 		<form method="get" action="/search" class="search-form">
 			<input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
 			<input id="go" type="submit" name="search" value="Go!"> </form>
 		<a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
-		<a href="#"><img class="menu-img" src="/img/feed.png"></a>
+		<a href="/notification.html">
+			<div id="notification"></div><img class="menu-img" src="/img/feed.png"> </a>
 		<a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
 		<a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
 		<a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>
@@ -42,15 +47,16 @@
 			</div>
 		</div>
 		<div class="top-bar" align="left">
-			<form class="form-bar" method="post">
+			<form class="form-bar" method="post" id="formliking">
 				<input class="input d1" type="submit" name="pov" value="follow">
-				<input class="input d2" type="submit" name="pov" value="unfollow">
-				<div class="relation">{{follow}}</div>
+				<input class="input d2" type="submit" name="pov" value="unfollow"> </form>
+			<div class="relation">{{follow}}</div>
 		</div> {{/users.infos}}
 		<div id="my_pictures" class="usr-set"> {{>display_pictures}} </div>
 		<div class="bottom-bar" align="left">
-			<input class="input d2" type="submit" name="pov" value="block">
-			<input class="input d2" type="submit" name="pov" value="reported"> </form>
+			<form class="form-bar" method="post" id="formliking">
+				<input class="input d2" type="submit" name="pov" value="block">
+				<input class="input d2" type="submit" name="pov" value="reported"> </form>
 		</div>
 		<div class="hud-tags"> {{>display_tags}} </div>
 		<div class="separator"></div>
