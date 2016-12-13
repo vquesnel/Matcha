@@ -5,12 +5,11 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
 	<title>Matcha | Message</title>
 	<link href="/stylesheets/main.css" rel="stylesheet">
-	<link href="/stylesheets/message.css" rel="stylesheet">
-	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
+	<link href="/stylesheets/message.css" rel="stylesheet">
 	<script src="/js/typeahead.min.js"></script>
 	<script src="/js/search.js"></script>
-	<script src="/js/message.js"></script>
 </head>
 
 <body>
@@ -19,7 +18,7 @@
 			<input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
 			<input id="go" type="submit" name="search" value="Go!"> </form>
 		<a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
-			<a href="/notification.html">
+		<a href="/notification.html">
 			<div id="notification"></div><img class="menu-img" src="/img/feed.png"> </a>
 		<a href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
 		<a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
@@ -33,21 +32,17 @@
 			<div class="onglet">Inbox</div> {{#message.infos}}
 			<div class="contact a{{class}}" onClick="document.location.href='/message.html/{{id}}'"> <img src="/{{profil_pic}}">
 				<div class="contact-info">{{firstname}} {{lastname}}</div>
-				<div class="contact-notification">2</div>
+				<div id="notif{{id}}" class="contact-notification">{{notification}}</div>
 			</div>{{/message.infos}} </div>
 		<div class="message" align="center">
-			<div class="onglet-2"> {{#chatwithme}}Chat with {{chatwithme}}{{/chatwithme}}{{^chatwithme}}Select a discussion{{/chatwithme}} </div>
-			<div id="msgtpl">
-				<p> <strong>{{user.username}}</strong> </p>
-				<p> {{message}} </p> <span>{{h}}:{{m}}</span> </div>
+			<div class="guest"> {{#chatwithme}}Chat with {{chatwithme}}{{/chatwithme}}{{^chatwithme}}Select a discussion{{/chatwithme}} </div>
+			<div id="msgtpl"> </div>
 			<div>
-				<form action="" id="form" class="message-area">
-					<textarea type="text" id="message" class="text"></textarea>
-					<input type="submit" id="send" value="Send" class="submit" /> </form>
-			</div>
+				<textarea type="text" id="message" class="text" name="messagetosend"></textarea>
+				<input type="submit" name="send" id="send" value="Send" class="submit" /> </div>
 		</div>
-	</div>
-	<script src="/js/main.js"></script>
+	</div> {{{baiserie}}}
+	<script src="/js/chat.js"></script>
 </body>
 
 </html>
