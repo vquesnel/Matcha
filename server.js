@@ -80,7 +80,7 @@ connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`matchs` ( `matcher` VARCH
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`block` ( `block_by` VARCHAR(255) NOT NULL , `blocked` VARCHAR(255) NOT NULL , `id` INT(5) NOT NULL AUTO_INCREMENT, PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`notification` (`id` INT(5) NOT NULL AUTO_INCREMENT, `sender` VARCHAR(255) NOT NULL , `sended` VARCHAR(255) NOT NULL, `content` VARCHAR(255) NOT NULL, `date` VARCHAR(255) NOT NULL,`seen` INT(1) NOT NULL DEFAULT '0', PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`dictionary` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `value` VARCHAR(255) NOT NULL , `score` INT(5) NOT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB  CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
-connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`messages` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `sender` VARCHAR(255) DEFAULT NULL , `reciehver` VARCHAR(255) DEFAULT NULL , `message` TEXT DEFAULT NULL , PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4;");
+connection.query("CREATE TABLE IF NOT EXISTS `matcha`.`messages` ( `id` INT(5) NOT NULL AUTO_INCREMENT , `sender` VARCHAR(255) DEFAULT NULL , `reciever` VARCHAR(255) DEFAULT NULL , `message` TEXT DEFAULT NULL ,`room` INT(5) DEFAULT NULL,  PRIMARY KEY (`id`)) ENGINE = InnoDB CHARSET=utf8mb4 COLLATE utf8mb4_bin;");
 connection = mysql.createPool({
 	connectionLimit: 100
 	, port: 3307
@@ -2171,7 +2171,7 @@ io.on('connection', function (socket) {
 		if (data.room) {
 			connection.query("SELECT * FROM matchs WHERE id = ?", [data.room], function (err, room) {
 				if (err) throw err;
-				else {
+				if (room[0]) {
 					if (room[0].matcher === data.user) {
 						var reciever = room[0].matched;
 					}
