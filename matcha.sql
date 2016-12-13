@@ -1,29 +1,23 @@
 -- phpMyAdmin SQL Dump
--- version 4.6.0
--- http://www.phpmyadmin.net
+-- version 4.6.4
+-- https://www.phpmyadmin.net/
 --
--- Host: localhost
--- Generation Time: Dec 13, 2016 at 04:27 PM
--- Server version: 5.7.11
--- PHP Version: 7.0.0
+-- Client :  localhost:3307
+-- Généré le :  Mar 13 Décembre 2016 à 20:05
+-- Version du serveur :  5.6.33
+-- Version de PHP :  7.0.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 SET time_zone = "+00:00";
 
-
-/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
-/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
-/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
-/*!40101 SET NAMES utf8mb4 */;
-
 --
--- Database: `matcha`
+-- Base de données :  `matcha`
 --
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `block`
+-- Structure de la table `block`
 --
 
 CREATE TABLE `block` (
@@ -33,17 +27,16 @@ CREATE TABLE `block` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `block`
+-- Contenu de la table `block`
 --
 
 INSERT INTO `block` (`block_by`, `blocked`, `id`) VALUES
-('vico', 'corentine', 1),
 ('kiefer', 'corentine', 2);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `dictionary`
+-- Structure de la table `dictionary`
 --
 
 CREATE TABLE `dictionary` (
@@ -53,7 +46,7 @@ CREATE TABLE `dictionary` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `dictionary`
+-- Contenu de la table `dictionary`
 --
 
 INSERT INTO `dictionary` (`id`, `value`, `score`) VALUES
@@ -113,7 +106,7 @@ INSERT INTO `dictionary` (`id`, `value`, `score`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `history`
+-- Structure de la table `history`
 --
 
 CREATE TABLE `history` (
@@ -123,7 +116,7 @@ CREATE TABLE `history` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `history`
+-- Contenu de la table `history`
 --
 
 INSERT INTO `history` (`visitor`, `visited`, `id`) VALUES
@@ -152,7 +145,7 @@ INSERT INTO `history` (`visitor`, `visited`, `id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `liking`
+-- Structure de la table `liking`
 --
 
 CREATE TABLE `liking` (
@@ -162,7 +155,7 @@ CREATE TABLE `liking` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `liking`
+-- Contenu de la table `liking`
 --
 
 INSERT INTO `liking` (`liker`, `liked`, `id`) VALUES
@@ -174,12 +167,13 @@ INSERT INTO `liking` (`liker`, `liked`, `id`) VALUES
 ('kiefer', 'jacques', 47),
 ('jacques', 'kiefer', 48),
 ('kiefer', 'vico', 52),
-('vico', 'jb', 60);
+('vico', 'jb', 60),
+('vico', 'kiefer', 63);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `matchs`
+-- Structure de la table `matchs`
 --
 
 CREATE TABLE `matchs` (
@@ -189,17 +183,18 @@ CREATE TABLE `matchs` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `matchs`
+-- Contenu de la table `matchs`
 --
 
 INSERT INTO `matchs` (`matcher`, `matched`, `id`) VALUES
 ('jacques', 'kiefer', 3),
-('vico', 'jb', 12);
+('vico', 'jb', 12),
+('vico', 'kiefer', 13);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `messages`
+-- Structure de la table `messages`
 --
 
 CREATE TABLE `messages` (
@@ -211,17 +206,52 @@ CREATE TABLE `messages` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `messages`
+-- Contenu de la table `messages`
 --
 
 INSERT INTO `messages` (`id`, `sender`, `reciever`, `message`, `room`) VALUES
 (1, 'vico', 'jb', 'zfbdfg', 12),
-(2, 'vico', 'jb', '😍', 12);
+(2, 'vico', 'jb', '😍', 12),
+(3, 'vico', 'jb', 'sagdaf', 12),
+(4, 'vico', 'jb', 'sadffffd', 12),
+(5, 'vico', 'jb', 'we\n\n', 12),
+(6, 'vico', 'jb', 'e', 12),
+(7, 'vico', 'jb', 'e', 12),
+(8, 'vico', 'jb', 'e', 12),
+(9, 'vico', 'jb', 'e', 12),
+(10, 'vico', 'jb', 'werqr', 12),
+(11, 'vico', 'jb', 'werqewrqwrrrrrr', 12),
+(12, 'vico', 'jb', 'werqrqwer', 12),
+(13, 'vico', 'jb', 're', 12),
+(14, 'vico', 'jb', 'e', 12),
+(15, 'jb', 'vico', '😜', 12),
+(16, 'jb', 'vico', 'asd', 12),
+(17, 'jb', 'vico', 'a', 12),
+(18, 'jb', 'vico', 'a', 12),
+(19, 'jb', 'vico', 'a', 12),
+(20, 'jb', 'vico', 'a', 12),
+(21, 'jb', 'vico', 'a', 12),
+(22, 'jb', 'vico', 'a', 12),
+(23, 'jb', 'vico', 'a', 12),
+(24, 'jb', 'vico', 'a', 12),
+(25, 'jb', 'vico', 'a', 12),
+(26, 'jb', 'vico', 'a', 12),
+(27, 'jb', 'vico', 'a', 12),
+(28, 'jb', 'vico', 'a', 12),
+(29, 'jb', 'vico', 'a', 12),
+(30, 'vico', 'jb', 'fasfsdfkeqjsb;kbv;kbsr;bcjvks;jvhweasrlhjco;eabgsR?LCH\nrsva;bjbvw\'asc\nfqethavf\netasfbhv\nanfhv\ntat\nve', 12),
+(31, 'vico', 'jb', '  ', 12),
+(32, 'vico', 'jb', 'sdaf', 12),
+(33, 'vico', 'jb', 'dsaaaa', 12),
+(34, 'vico', 'jb', '<script>alert("")</script>\n', 12),
+(35, 'vico', 'jb', 'ssdf', 12),
+(36, 'vico', 'jb', 'dfs\n', 12),
+(37, 'vico', 'jb', 'dsf', 12);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `notification`
+-- Structure de la table `notification`
 --
 
 CREATE TABLE `notification` (
@@ -234,7 +264,7 @@ CREATE TABLE `notification` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `notification`
+-- Contenu de la table `notification`
 --
 
 INSERT INTO `notification` (`id`, `sender`, `sended`, `content`, `date`, `seen`) VALUES
@@ -603,13 +633,13 @@ INSERT INTO `notification` (`id`, `sender`, `sended`, `content`, `date`, `seen`)
 (562, 'corentine', 'vico', 'corentine bidaud send you a new message', '2016-12-13 15 : 49', 1),
 (563, 'corentine', 'vico', 'corentine bidaud send you a new message', '2016-12-13 15 : 49', 1),
 (564, 'corentine', 'vico', 'corentine bidaud send you a new message', '2016-12-13 15 : 49', 1),
-(565, 'vico', 'corentine', 'victor quesnel has visited your profil', '2016-12-13 15 : 50', 0),
-(566, 'vico', 'corentine', 'victor quesnel has visited your profil', '2016-12-13 15 : 50', 0),
+(565, 'vico', 'corentine', 'victor quesnel has visited your profil', '2016-12-13 15 : 50', 1),
+(566, 'vico', 'corentine', 'victor quesnel has visited your profil', '2016-12-13 15 : 50', 1),
 (567, 'vico', 'kiefer', 'victor quesnel has visited your profil', '2016-12-13 16 : 5', 1),
 (568, 'vico', 'kiefer', 'victor quesnel don\'t like your profil anymore', '2016-12-13 16 : 5', 1),
-(569, 'vico', 'corentine', 'victor quesnel has visited your profil', '2016-12-13 16 : 7', 0),
-(570, 'vico', 'corentine', 'victor quesnel don\'t like your profil anymore', '2016-12-13 16 : 7', 0),
-(571, 'vico', 'corentine', 'victor quesnel has visited your profil', '2016-12-13 16 : 8', 0),
+(569, 'vico', 'corentine', 'victor quesnel has visited your profil', '2016-12-13 16 : 7', 1),
+(570, 'vico', 'corentine', 'victor quesnel don\'t like your profil anymore', '2016-12-13 16 : 7', 1),
+(571, 'vico', 'corentine', 'victor quesnel has visited your profil', '2016-12-13 16 : 8', 1),
 (572, 'corentine', 'vico', 'corentine bidaud has visited your profil', '2016-12-13 16 : 8', 1),
 (573, 'corentine', 'vico', 'corentine bidaud liked your profil', '2016-12-13 16 : 8', 1),
 (577, 'vico', 'jb', 'victor quesnel has visited your profil', '2016-12-13 16 : 28', 0),
@@ -667,25 +697,66 @@ INSERT INTO `notification` (`id`, `sender`, `sended`, `content`, `date`, `seen`)
 (629, 'kiefer', 'jacques', 'Kiefer wiessler send you a new message', '2016-12-13 16 : 52', 0),
 (630, 'kiefer', 'jacques', 'Kiefer wiessler send you a new message', '2016-12-13 16 : 52', 0),
 (631, 'kiefer', 'jacques', 'Kiefer wiessler send you a new message', '2016-12-13 16 : 52', 0),
-(632, 'kiefer', 'corentine', 'Kiefer wiessler has visited your profil', '2016-12-13 16 : 53', 0),
+(632, 'kiefer', 'corentine', 'Kiefer wiessler has visited your profil', '2016-12-13 16 : 53', 1),
 (633, 'corentine', 'kiefer', 'corentine bidaud visited your profil', '2016-12-13 17 : 4', 1),
 (634, 'corentine', 'kiefer', 'corentine bidaud visited your profil', '2016-12-13 17 : 4', 1),
 (635, 'corentine', 'kiefer', 'corentine bidaud liked your profil', '2016-12-13 17 : 4', 1),
 (636, 'corentine', 'kiefer', 'corentine bidaud don\'t liked your profil', '2016-12-13 17 : 4', 1),
 (637, 'corentine', 'kiefer', 'corentine bidaud visited your profil', '2016-12-13 17 : 5', 1),
 (638, 'corentine', 'kiefer', 'corentine bidaud visited your profil', '2016-12-13 17 : 7', 1),
-(639, 'kiefer', 'corentine', 'Kiefer wiessler visited your profil', '2016-12-13 17 : 7', 0),
-(640, 'kiefer', 'corentine', 'Kiefer wiessler visited your profil', '2016-12-13 17 : 12', 0),
+(639, 'kiefer', 'corentine', 'Kiefer wiessler visited your profil', '2016-12-13 17 : 7', 1),
+(640, 'kiefer', 'corentine', 'Kiefer wiessler visited your profil', '2016-12-13 17 : 12', 1),
 (641, 'corentine', 'kiefer', 'corentine bidaud visited your profil', '2016-12-13 17 : 12', 1),
 (642, 'kiefer', 'jacques', 'Kiefer wiessler send you a new message', '2016-12-13 17 : 13', 0),
-(643, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 17 : 25', 0),
+(643, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 17 : 25', 1),
 (644, 'vico', 'jb', 'victor quesnel visited your profil', '2016-12-13 17 : 25', 0),
-(645, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 17 : 25', 0);
+(645, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 17 : 25', 1),
+(646, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 49', 1),
+(647, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 49', 1),
+(648, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 50', 1),
+(649, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 50', 1),
+(650, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 50', 1),
+(651, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 50', 1),
+(652, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 50', 1),
+(653, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 50', 1),
+(654, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 50', 1),
+(655, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 52', 1),
+(656, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 52', 1),
+(657, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 53', 1),
+(658, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(659, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(660, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(661, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(662, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(663, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(664, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(665, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(666, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(667, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(668, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(669, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(670, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(671, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(672, 'jb', 'vico', 'jb marsal send you a new message', '2016-12-13 18 : 56', 1),
+(673, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 59', 0),
+(674, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 59', 0),
+(675, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 18 : 59', 0),
+(676, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 19 : 0', 0),
+(677, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 19 : 0', 0),
+(678, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 19 : 8', 0),
+(679, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 19 : 9', 0),
+(680, 'vico', 'kiefer', 'victor quesnel visited your profil', '2016-12-13 19 : 10', 0),
+(681, 'vico', 'kiefer', 'victor quesnel liked your profil', '2016-12-13 19 : 10', 0),
+(682, 'corentine', 'vico', 'corentine bidaud visited your profil', '2016-12-13 19 : 11', 1),
+(683, 'corentine', 'vico', 'corentine bidaud visited your profil', '2016-12-13 19 : 11', 1),
+(684, 'corentine', 'vico', 'corentine bidaud visited your profil', '2016-12-13 19 : 12', 1),
+(685, 'corentine', 'vico', 'corentine bidaud visited your profil', '2016-12-13 19 : 12', 1),
+(686, 'vico', 'jb', 'victor quesnel send you a new message', '2016-12-13 19 : 56', 0);
 
 -- --------------------------------------------------------
 
 --
--- Table structure for table `pictures`
+-- Structure de la table `pictures`
 --
 
 CREATE TABLE `pictures` (
@@ -695,7 +766,7 @@ CREATE TABLE `pictures` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `pictures`
+-- Contenu de la table `pictures`
 --
 
 INSERT INTO `pictures` (`id`, `pic`, `username`) VALUES
@@ -721,7 +792,7 @@ INSERT INTO `pictures` (`id`, `pic`, `username`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `reports`
+-- Structure de la table `reports`
 --
 
 CREATE TABLE `reports` (
@@ -731,7 +802,7 @@ CREATE TABLE `reports` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `reports`
+-- Contenu de la table `reports`
 --
 
 INSERT INTO `reports` (`reporter`, `reported`, `id`) VALUES
@@ -741,7 +812,7 @@ INSERT INTO `reports` (`reporter`, `reported`, `id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `tags`
+-- Structure de la table `tags`
 --
 
 CREATE TABLE `tags` (
@@ -751,7 +822,7 @@ CREATE TABLE `tags` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin;
 
 --
--- Dumping data for table `tags`
+-- Contenu de la table `tags`
 --
 
 INSERT INTO `tags` (`tag`, `username`, `id`) VALUES
@@ -805,7 +876,7 @@ INSERT INTO `tags` (`tag`, `username`, `id`) VALUES
 -- --------------------------------------------------------
 
 --
--- Table structure for table `UserComment`
+-- Structure de la table `UserComment`
 --
 
 CREATE TABLE `UserComment` (
@@ -817,7 +888,7 @@ CREATE TABLE `UserComment` (
 -- --------------------------------------------------------
 
 --
--- Table structure for table `users`
+-- Structure de la table `users`
 --
 
 CREATE TABLE `users` (
@@ -844,147 +915,144 @@ CREATE TABLE `users` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_bin ROW_FORMAT=COMPACT;
 
 --
--- Dumping data for table `users`
+-- Contenu de la table `users`
 --
 
 INSERT INTO `users` (`id`, `firstname`, `lastname`, `username`, `birthday`, `email`, `password`, `sexe`, `token`, `validation`, `profil_pic`, `sexual_or`, `bio`, `location`, `currlat`, `currlong`, `pop`, `login`, `sessionID`, `socket_id`) VALUES
-(1, 'victor', 'quesnel', 'vico', '1993-10-04', 'victor-quesnel@hotmail.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd993nm', '0', 'upload/vico-6yf3gssiwjc03ii.png', 'hetero', 'Hello World Matcha 😃', ' 75004 Paris', '48.86000000', '2.35000000', 198, 'online', 'yrPx0gs_m3WmdO1l7RNzwR3e0kY0MTIV', 'Pt4njiyZ46VrwO0cAAAB'),
-(2, 'corentine', 'bidaud', 'corentine', '1993-08-09', 'co@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'female', 'lqmj3mviwd99l3f', '0', 'upload/corentine-lqmj4j7iwd9r0tx.png', 'hetero', NULL, ' 75004 Paris', '48.86000000', '2.35000000', 21, 'online', 'IWTxIpZpuUvtnc_d2WlKGEGDk77Kk6XM', 'X2XZCe1jPiQMfIGQAAAD'),
-(3, 'Jacques', 'Simonian', 'jacques', '1992-09-22', 'johny@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd9a46x', '0', 'upload/jacques-lqmj4j7iwd9t4bi.png', 'bi', 'ZDP QLF 👑', ' 75003 Paris', '48.86000000', '2.35000000', 17, '2016-12-13', 'G2ulEOrhkXLFYx_hgmff1PO1giiTuT8e', 'yEW1mATuGN7cawu2AAAi'),
-(4, 'Kiefer', 'wiessler', 'kiefer', '1992-12-22', 'kwiessle@student.42.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'male', 'lqmj3mviwd9aib6', '0', 'upload/kiefer-lqmj4j7iwd9utge.png', 'hetero', 'ZDP ', ' 75004 Paris', '48.86000000', '2.35000000', 41, 'online', '6fK6n9-BhQtQjopeAhJTtMgY5c0iKbzb', 'lp_AFVLNwAqh6RScAAAA'),
-(5, 'jb', 'marsal', 'jb', '1985-10-22', 'jmarsal@student.42.fr', '7d0665438e81d8eceb98c1e31fca80c1', 'female', 'lqmj3mviwd9az6k', '0', 'upload/jb-lqmj4j7iwd9suo4.png', 'gay', 'Coucou tout le monde', ' 75017 Paris', '48.89250000', '2.34440000', 26, 'online', 'hwFgFRmac3aaHLxxmNFnIs6D5T7cZ51_', '9ixdPeyxy73tMYhgAAAC'),
-(7, 'vico', 'vico', 'wess', '1993-10-04', 'wessh@gmail.com', 'c10a80bb6a49178c52c3c0ecbd40c7a0', 'male', '7uscusiwerbn6d', '0', 'upload/wess-7uscusiwerckxe.png', 'gay', NULL, ' 75017 Paris', NULL, NULL, 2, '2016-12-08', '1gh8hXBGYzHgcZzwcOTZSDXUpRMmO-t9', NULL),
-(8, 'Laura', 'LOPESA', 'laura', '1990-10-10', 'laura@gmail.com', '7d0665438e81d8eceb98c1e31fca80c1', 'female', '7us1ftkiwg9fmzo', '0', 'upload/laura-7us1g4iiwga2465.png', 'bi', NULL, ' 75004 Paris', '48.86370000', '2.36150000', 21, '2016-12-12', 'f2U3bHo2fe__JCanJEHZSB0usX_tO1LY', '-yWj_FFgLEUMbzTxAAAa');
+(1, 'victor', 'quesnel', 'vico', '1993-10-04', 'victor-quesnel@hotmail.fr', '4d9c9990eefcfac6d505bfd28e15290a4ae63de3f32bf9e0ab01a959af4ec2a2', 'male', '6yf358xiwnvcfm9', '0', 'upload/vico-6yf3gssiwjbztcb.png', 'hetero', 'Hello World Matcha 😃', ' 75003 Paris', '48.86370000', '2.36150000', 208, '2016-12-13', 'S9Bg_KNSzwWyCZScEeWTkn_zeMDiPLFx', 'bSqI_qQRSWv_ZlAXAAAB'),
+(2, 'corentine', 'bidaud', 'corentine', '1993-08-09', 'co@gmail.com', '6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0', 'female', 'lqmj3mviwd99l3f', '0', 'upload/corentine-lqmj4j7iwd9r0tx.png', 'hetero', NULL, ' 75003 Paris', '48.86101690', '2.35696590', 21, 'online', 'tJhgVzs5jmBp3evSVt3qzF0YIS274t4r', 'uFR2g8QCjt1kLg5SAAAB'),
+(3, 'Jacques', 'Simonian', 'jacques', '1992-09-22', 'johny@gmail.com', '6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0', 'male', 'lqmj3mviwd9a46x', '0', 'upload/jacques-lqmj4j7iwd9t4bi.png', 'bi', 'ZDP QLF 👑', ' 75003 Paris', '48.86000000', '2.35000000', 17, '2016-12-13', 'G2ulEOrhkXLFYx_hgmff1PO1giiTuT8e', 'yEW1mATuGN7cawu2AAAi'),
+(4, 'Kiefer', 'wiessler', 'kiefer', '1992-12-22', 'kwiessle@student.42.fr', '6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0', 'male', 'lqmj3mviwd9aib6', '0', 'upload/kiefer-lqmj4j7iwd9utge.png', 'hetero', 'ZDP ', ' 75004 Paris', '48.86000000', '2.35000000', 56, 'online', '6fK6n9-BhQtQjopeAhJTtMgY5c0iKbzb', 'lp_AFVLNwAqh6RScAAAA'),
+(5, 'jb', 'marsal', 'jb', '1985-10-22', 'jmarsal@student.42.fr', '6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0', 'female', 'lqmj3mviwd9az6k', '0', 'upload/jb-lqmj4j7iwd9suo4.png', 'gay', 'Coucou tout le monde', ' 75017 Paris', '48.86370000', '2.36150000', 26, '2016-12-13', 'Vqc3TspqNiDJllWndKwDGca6U2c8MWn2', '_Z9Cspsq7-0MpwCrAAAE'),
+(7, 'vico', 'vico', 'wess', '1993-10-04', 'wessh@gmail.com', '6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0', 'male', '7uscusiwerbn6d', '0', 'upload/wess-7uscusiwerckxe.png', 'gay', NULL, ' 75017 Paris', NULL, NULL, 2, '2016-12-08', '1gh8hXBGYzHgcZzwcOTZSDXUpRMmO-t9', NULL),
+(8, 'Laura', 'LOPESA', 'laura', '1990-10-10', 'laura@gmail.com', '6cd5b6e51936a442b973660c21553dd22bd72ddc8751132a943475288113b4c0', 'female', '7us1ftkiwg9fmzo', '0', 'upload/laura-7us1g4iiwga2465.png', 'bi', NULL, ' 75004 Paris', '48.86370000', '2.36150000', 21, '2016-12-12', 'f2U3bHo2fe__JCanJEHZSB0usX_tO1LY', '-yWj_FFgLEUMbzTxAAAa');
 
 --
--- Indexes for dumped tables
+-- Index pour les tables exportées
 --
 
 --
--- Indexes for table `block`
+-- Index pour la table `block`
 --
 ALTER TABLE `block`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `dictionary`
+-- Index pour la table `dictionary`
 --
 ALTER TABLE `dictionary`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `history`
+-- Index pour la table `history`
 --
 ALTER TABLE `history`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `liking`
+-- Index pour la table `liking`
 --
 ALTER TABLE `liking`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `matchs`
+-- Index pour la table `matchs`
 --
 ALTER TABLE `matchs`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `messages`
+-- Index pour la table `messages`
 --
 ALTER TABLE `messages`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `notification`
+-- Index pour la table `notification`
 --
 ALTER TABLE `notification`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `pictures`
+-- Index pour la table `pictures`
 --
 ALTER TABLE `pictures`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `reports`
+-- Index pour la table `reports`
 --
 ALTER TABLE `reports`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `tags`
+-- Index pour la table `tags`
 --
 ALTER TABLE `tags`
   ADD PRIMARY KEY (`id`);
 
 --
--- Indexes for table `users`
+-- Index pour la table `users`
 --
 ALTER TABLE `users`
   ADD PRIMARY KEY (`id`);
 
 --
--- AUTO_INCREMENT for dumped tables
+-- AUTO_INCREMENT pour les tables exportées
 --
 
 --
--- AUTO_INCREMENT for table `block`
+-- AUTO_INCREMENT pour la table `block`
 --
 ALTER TABLE `block`
   MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
--- AUTO_INCREMENT for table `dictionary`
+-- AUTO_INCREMENT pour la table `dictionary`
 --
 ALTER TABLE `dictionary`
   MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=53;
 --
--- AUTO_INCREMENT for table `history`
+-- AUTO_INCREMENT pour la table `history`
 --
 ALTER TABLE `history`
   MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=22;
 --
--- AUTO_INCREMENT for table `liking`
+-- AUTO_INCREMENT pour la table `liking`
 --
 ALTER TABLE `liking`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=64;
 --
--- AUTO_INCREMENT for table `matchs`
+-- AUTO_INCREMENT pour la table `matchs`
 --
 ALTER TABLE `matchs`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=14;
 --
--- AUTO_INCREMENT for table `messages`
+-- AUTO_INCREMENT pour la table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=38;
 --
--- AUTO_INCREMENT for table `notification`
+-- AUTO_INCREMENT pour la table `notification`
 --
 ALTER TABLE `notification`
-  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=646;
+  MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=687;
 --
--- AUTO_INCREMENT for table `pictures`
+-- AUTO_INCREMENT pour la table `pictures`
 --
 ALTER TABLE `pictures`
   MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=26;
 --
--- AUTO_INCREMENT for table `reports`
+-- AUTO_INCREMENT pour la table `reports`
 --
 ALTER TABLE `reports`
   MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 --
--- AUTO_INCREMENT for table `tags`
+-- AUTO_INCREMENT pour la table `tags`
 --
 ALTER TABLE `tags`
   MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=63;
 --
--- AUTO_INCREMENT for table `users`
+-- AUTO_INCREMENT pour la table `users`
 --
 ALTER TABLE `users`
   MODIFY `id` int(5) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
-/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
-/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
-/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
