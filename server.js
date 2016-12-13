@@ -747,12 +747,18 @@ app.post('/update', function (req, res) {
         if (req.body.firstname) {
             connection.query("UPDATE users SET firstname = ? WHERE username = ?", [req.body.firstname, req.session.username], function (err) {
                 if (err) throw err;
+                else {
+                    req.session.firstname = req.body.firstname
+                }
             });
             infos.messageprofil = "Profil has been updated";
         }
         if (req.body.lastname) {
             connection.query("UPDATE users SET lastname = ? WHERE username = ?", [req.body.lastname, req.session.username], function (err) {
                 if (err) throw err;
+                else {
+                    req.session.lastname = req.body.lastname
+                }
             });
             infos.messageprofil = "Profil has been updated";
         }
@@ -771,6 +777,9 @@ app.post('/update', function (req, res) {
         if (req.body.orientation) {
             connection.query("UPDATE users SET sexual_or = ? WHERE username = ?", [req.body.orientation, req.session.username], function (err) {
                 if (err) throw err;
+                else {
+                    req.session.sexual_or = req.body.orientation
+                }
             })
             infos.messageprofil = "Profil has been updated";
         }
