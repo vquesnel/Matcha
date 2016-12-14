@@ -15,7 +15,6 @@
     height: 120px;
     background: #7fc4ff;
     background: -webkit-linear-gradient(left top, #7fc4ff, #569ef2);
-    background: -o-linear-gradient(bottom right, #7fc4ff, #569ef2);
     background: -moz-linear-gradient(bottom right, #7fc4ff, #569ef2);
     background: linear-gradient(to bottom right, #7fc4ff, #569ef2);
 }
@@ -31,7 +30,6 @@
     border: none;
     background: #7fc4ff;
     background: -webkit-linear-gradient(left top, #7fc4ff, #569ef2);
-    background: -o-linear-gradient(bottom right, #7fc4ff, #569ef2);
     background: -moz-linear-gradient(bottom right, #7fc4ff, #569ef2);
     background: linear-gradient(to bottom right, #7fc4ff, #569ef2);
     border-radius: 5px;

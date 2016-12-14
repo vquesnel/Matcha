@@ -1,46 +1,47 @@
 <html>
 
 <head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-    <title>Matcha | Profile</title>
-    <link href="/stylesheets/main.css" rel="stylesheet">
-    <link href="/stylesheets/match.css" rel="stylesheet">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
-    <script src="https://localhost:4433/socket.io/socket.io.js"></script>
-    <script src="/js/typeahead.min.js"></script>
-    <script src="/js/mustache.js"></script>
-    <script src="/js/main.js"></script>
-    <script src="/js/profile.js"></script>
-    <script src="/js/search.js"></script>
-    <script src="/js/notification.js"></script>
-
-
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+	<title>Matcha | Profile</title>
+	<link href="/stylesheets/main.css" rel="stylesheet">
+	<link href="/stylesheets/match.css" rel="stylesheet">
+	<link rel="icon" type="image/png" href="/img/tulip.png">
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
+	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
+	<script src="/js/typeahead.min.js"></script>
+	<script src="/js/mustache.js"></script>
+	<script src="/js/main.js"></script>
+	<script src="/js/profile.js"></script>
+	<script src="/js/search.js"></script>
+	<script src="/js/notification.js"></script>
 </head>
 
 <body>
-    <div class="menu">
-        <form method="get" action="/search" class="search-form">
-            <input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
-            <input id="go" type="submit" name="search" value="Go!"> </form>
-        <a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
-        <a href="/notification.html">
-            <div id="notification"></div><img class="menu-img" src="/img/feed.png"> </a>
-        <a id="account" href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
-        <a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
-        <a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>
-    </div>
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <div class="site-content" align="center">
-        <div id="match" class="hud" align="left"> {{>homepage_test}} </div>
-        <h1>{{message}}</h1> </div>
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <div class="separator"></div>
-    <script src="/js/main.js"></script>
+	<div class="menu">
+		<form method="get" action="/search" class="search-form">
+			<input id="search-bar" type="text" name="search" placeholder="Search ..." class="typeahead tt-query" spellcheck="false" autocomplete="on" name="typeahead">
+			<input id="go" type="submit" name="search" value="Go!"> </form>
+		<a href="/match.html"> <img id="menu-logo" src="/img/mini-logo.png" alt="mini-logo"></a>
+		<div class="pop-notification">
+			<div id="notification"></div>
+			<a href="/notification.html"> <img class="menu-img" src="/img/feed.png"> </a>
+		</div>
+		<a id="account" href="/profile.html"><img class="menu-img" src="/img/account.png"></a>
+		<a href="/message.html"><img class="menu-img" src="/img/envelope.png"></a>
+		<a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>
+	</div>
+	<div class="separator"></div>
+	<div class="separator"></div>
+	<div class="separator"></div>
+	<div class="separator"></div>
+	<div class="site-content" align="center">
+		<div id="match" class="hud" align="center"> {{>homepage_test}} </div>
+		<h1>{{message}}</h1> </div>
+	<div class="separator"></div>
+	<div class="separator"></div>
+	<div class="separator"></div>
+	<script src="/js/main.js"></script>
 </body>
 
 </html>

@@ -1,5 +1,6 @@
-$(window).bind('beforeunload', function () {
-    var socket = io.connect('https://localhost:4433');
-    socket.emit("seen Notification", {});
-
-});
+(function ($) {
+	$(document).ready(function () {
+		var socket = io.connect('https://localhost:4433');
+		socket.emit("seen Notification", {});
+	})
+})(jQuery);

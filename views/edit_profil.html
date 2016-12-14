@@ -6,6 +6,7 @@
 	<title>Matcha | Edit Profil</title>
 	<link href="/stylesheets/main.css" rel="stylesheet">
 	<link href="/stylesheets/edit_profil.css" rel="stylesheet">
+		<link rel="icon" type="image/png" href="/img/tulip.png">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.2.2/jquery.min.js"></script>
 	<script src="https://localhost:4433/socket.io/socket.io.js"></script>
 	<script src="/js/typeahead.min.js"></script>
@@ -22,9 +23,10 @@
             <input id="go" type="submit" name="search" value="Go!">
         </form>
 		<a href="match.html"> <img id="menu-logo" src="img/mini-logo.png" alt="mini-logo"></a>
-				<a href="/notification.html">
-			<div id="notification"></div><img class="menu-img" src="/img/feed.png"> </a>
-
+				<div class="pop-notification">
+			<div id="notification"></div>
+			<a href="/notification.html"> <img class="menu-img" src="/img/feed.png"> </a>
+		</div>
 		<a href="profile.html"><img class="menu-img" src="/img/account.png"></a>
 		<a href="message.html"><img class="menu-img" src="/img/envelope.png"></a>
 		<a href="/logout.html"><img class="menu-img" src="/img/logout.png"></a>

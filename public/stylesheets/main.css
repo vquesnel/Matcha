@@ -25,7 +25,6 @@
    	position: fixed;
    	background: #7fc4ff;
    	background: -webkit-linear-gradient(left top, #7fc4ff, #569ef2);
-   	background: -o-linear-gradient(bottom right, #7fc4ff, #569ef2);
    	background: -moz-linear-gradient(bottom right, #7fc4ff, #569ef2);
    	background: linear-gradient(to bottom right, #7fc4ff, #569ef2);
    	z-index: 10;
@@ -72,7 +71,7 @@
    	width: 230px;
    }
    
-   #search-bar::-webkit-input-placeholder {
+   #search-bar {
    	color: white;
    }
    
@@ -102,16 +101,27 @@
    	margin-bottom: 5px;
    }
    
-   #notification {
+   .pop-notification {
+   	display: inline-block;
    	float: right;
+   }
+   
+   #notification {
+   	position: absolute;
+   	top: 15px;
+   	right: 8px;
    	background: red;
-   	/*   	padding: 5px;*/
+   	padding: 3px;
+   	text-align: center;
    	height: 15px;
+   	font-size: 12px;
    	line-height: 15px;
    	width: 15px;
    	color: white;
    	border-radius: 50%;
    	border: 2px solid white;
+   	vertical-align: bottom;
+   	z-index: 10;
    }
    
    .tt-query,

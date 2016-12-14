@@ -9,7 +9,6 @@
     width: 460px;
     background: #7fc4ff;
     background: -webkit-linear-gradient(left top, #7fc4ff, #569ef2);
-    background: -o-linear-gradient(bottom right, #7fc4ff, #569ef2);
     background: -moz-linear-gradient(bottom right, #7fc4ff, #569ef2);
     background: linear-gradient(to bottom right, #7fc4ff, #569ef2);
     padding-bottom: 30px;
@@ -74,7 +73,6 @@ textarea {
     border: none;
     background: #7fc4ff;
     background: -webkit-linear-gradient(left top, #7fc4ff, #569ef2);
-    background: -o-linear-gradient(bottom right, #7fc4ff, #569ef2);
     background: -moz-linear-gradient(bottom right, #7fc4ff, #569ef2);
     background: linear-gradient(to bottom right, #7fc4ff, #569ef2);
 }
