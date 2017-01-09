@@ -19,7 +19,6 @@ var connection = mysql.createConnection({
 var bodyParser = require('body-parser');
 var mustacheExpress = require('mustache-express');
 var create_account = require('./server/create_Account');
-var db = require("./server/notification");
 var profile = require('./server/profile');
 var index = require("./server/index");
 var moment = require('moment');
